@@ -1,0 +1,43 @@
+{
+  "name": "@vestfoldfylke/loglady",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "package.json"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "pack": "npm run test && npm run build && npm pack",
+    "test": "eslint ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vestfoldfylke/loglady.git"
+  },
+  "bugs": {
+    "url": "https://github.com/vestfoldfylke/loglady/issues"
+  },
+  "homepage": "https://github.com/vestfoldfylke/loglady/#readme",
+  "keywords": [
+    "log",
+    "logging",
+    "structured-logging"
+  ],
+  "author": {
+    "name": "Rune Moskvil Lyngås",
+    "email": "rune.moskvil.lyngas@vestfoldfylke.no",
+    "url": "https://github.com/runely"
+  },
+  "license": "MIT",
+  "description": "My log has something to tell you",
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/parser": "^8.46.1",
+    "eslint": "^9.38.0",
+    "typescript": "^5.9.3"
+  }
+}
