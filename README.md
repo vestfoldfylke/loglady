@@ -21,9 +21,10 @@ The following log destinations are planned before v1.0.0:
 
 loglady is built with extensibility in mind. A new log destination can be created by implementing the `LogDestination` interface.
 
-1. Create a new folder under `src/destinations/` for your custom destination.
-2. Create a new class that implements the `LogDestination` interface.
-3. Implement the required properties and method(s).
+1. Create a new folder under `src/destinations/` for the new destination. Name the folder according to the destination name (e.g. `Console`).
+2. Create a new class that implements the `LogDestination` interface. Name the class according to the destination name (e.g. `ConsoleDestination`).
+3. Remember to export your class as default, otherwise loglady won't be able to instantiate it.
+4. Implement the required properties and method(s).
 
 > [!CAUTION]
 > Make sure that your `log` function sets the `isSettled` property to `true` when the promise is settled.<br />

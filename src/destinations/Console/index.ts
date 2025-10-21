@@ -1,6 +1,7 @@
 import type { LogDestination } from '../../types/LogDestination.types';
 import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
 
+// noinspection JSUnusedGlobalSymbols
 /**
  * @internal
  * 
@@ -9,7 +10,7 @@ import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.ty
  * **active**: Defaults to true, can be overridden by environment variables (check README)<br />
  * **name**: 'Console'
  */
-export class ConsoleDestination implements LogDestination {
+export default class ConsoleDestination implements LogDestination {
   active: boolean;
   name: string = 'Console';
 

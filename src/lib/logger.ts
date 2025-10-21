@@ -1,6 +1,6 @@
-// TODO: Should be imported by dynamic folder import
-import { ConsoleDestination } from '../destinations/console/index.js';
+import { readdirSync } from 'fs';
 
+import type { Dirent } from 'node:fs';
 import type { LogDestination } from '../types/LogDestination.types';
 import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../types/log.types';
 
@@ -17,10 +17,21 @@ export class Logger {
   // TODO: Implement a possibility to change the logConfig at any time, preserving the old config and adding new config on top
 
   private initialize = (): void => {
-    // TODO: Load all destinations from destinations folder dynamically based on configuration
-    this._destinations.push(
-      new ConsoleDestination()
-    );
+    // TODO: Get destinations config from environment variables
+
+    const destinationFolders: Dirent[] = readdirSync(new URL('../destinations', import.meta.url), { withFileTypes: true });
+    console.log(`[Logger] Loading destinations: ${destinationFolders.map(destinationFolder => destinationFolder.name).join(', ')}`);
+    destinationFolders.forEach((destinationFolder: Dirent): void => {
+      import(`../destinations/${destinationFolder.name}/index.js`).then((module) => {
+        // TODO: Get environment variables for this destination
+        const DestinationClass = module.default;
+
+        // TODO: Pass configuration to destination constructor
+        const destinationInstance: LogDestination = new DestinationClass();
+        this._destinations.push(destinationInstance);
+        console.log(`[Logger] Loaded destination: ${destinationInstance.name}`);
+      });
+    });
   };
 
   private getParameterValue = (param: string, value: MessageParameter): string => {
