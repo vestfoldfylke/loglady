@@ -7,15 +7,19 @@ import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.ty
  * 
  * LogDestination that logs to the console<br /><br />
  * 
- * **active**: Defaults to true, can be overridden by environment variables (check README)<br />
+ * **active**: Defaults to true, can be overridden by setting environment variable **CONSOLE_ENABLED** to `false`<br />
  * **name**: 'Console'
  */
 export default class ConsoleDestination implements LogDestination {
-  active: boolean;
-  name: string = 'Console';
+  readonly active: boolean;
+  readonly name: string = 'Console';
 
-  constructor(active?: boolean | undefined) {
-    this.active = active ?? true;
+  constructor() {
+    const active: string | boolean | undefined = process.env['CONSOLE_ENABLED'];
+
+    this.active = active === undefined
+      ? true
+      : String(active).trim().toLowerCase() === 'true';
   }
 
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {

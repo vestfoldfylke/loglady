@@ -23,6 +23,11 @@ To use the BetterStack log destination, you need to set the following environmen
 - `BETTERSTACK_URL`: Your BetterStack Endpoint URL
 - `BETTERSTACK_TOKEN`: The BetterStack token for authentication
 
+### Console destination
+
+The Console log destination is enabled by default. You can disable it by setting the following environment variable:
+- `CONSOLE_ENABLED`: Set to `false` to disable console logging
+
 ### Add your own log destination
 
 loglady is built with extensibility in mind. A new log destination can be created by implementing the `LogDestination` interface.
