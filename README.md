@@ -44,27 +44,26 @@ loglady is built with extensibility in mind. A new log destination can be create
 ## Usage
 
 ```typescript
-// NOTE: Import the log functions you need
-import { debug, info, warn, error, critical, fatal, flush } from '@vestfoldfylke/loglady';
+import { logger } from '@vestfoldfylke/loglady';
 
 // log at different levels. All log functions support message templates and parameters
-debug('This is a debug message');
-info('This is an info message for UserName {UserName}', 'john.doe');
-warn('This is a warning message');
+logger.debug('This is a debug message');
+logger.info('This is an info message for UserName {UserName}', 'john.doe');
+logger.warn('This is a warning message');
 
 // error, fatal and critical log functions also support logging exceptions
-error('This is an error message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-error(error, 'This is an error message with an exception but without additional parameters');
-error(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
+logger.error('This is an error message without an exception with ErrorMessage: {ErrorMessage}', error.message);
+logger.error(error, 'This is an error message with an exception but without additional parameters');
+logger.error(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
-fatal('This is a fatal message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-fatal(error, 'This is a fatal message with an exception but without additional parameters');
-fatal(error, 'This is a fatal message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
+logger.fatal('This is a fatal message without an exception with ErrorMessage: {ErrorMessage}', error.message);
+logger.fatal(error, 'This is a fatal message with an exception but without additional parameters');
+logger.fatal(error, 'This is a fatal message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
-critical('This is a critical message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-critical(error, 'This is a critical message with an exception but without additional parameters');
-critical(error, 'This is a critical message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
+logger.critical('This is a critical message without an exception with ErrorMessage: {ErrorMessage}', error.message);
+logger.critical(error, 'This is a critical message with an exception but without additional parameters');
+logger.critical(error, 'This is a critical message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
 // flush any log messages not completed yet (if applicable)
-await flush();
+await logger.flush();
 ```
