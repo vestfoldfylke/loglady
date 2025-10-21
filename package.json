@@ -8,6 +8,9 @@
     "package.json"
   ],
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "tsc",
     "pack": "npm run test && npm run build && npm pack",
