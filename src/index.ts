@@ -6,6 +6,8 @@ const _queue: TrackedPromise[] = [];
 
 const _logger = new Logger(_queue);
 
+// TODO: export functions under a namespace 'logger'?
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * Should be called before application exits or session is finished, to ensure all log messages have been processed (either successfully or with an error)
