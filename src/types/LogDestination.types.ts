@@ -4,19 +4,20 @@ export interface LogDestination {
   /**
    * Indicates whether the destination is active and should receive log messages. Can be overridden by environment variables (check README)<br /><br />
    * 
-   * Should be set in the constructor of the implementing class based on configuration or defaults to true or false
+   * Should be set in the constructor of the implementing class based on environment variables
    * ```typescript
-   * constructor(active?: boolean) {
-   *   this.active = active ?? true; // or false based on desired default
+   * constructor() {
+   *   // determine active status based on environment variable(s)
+   *   this.active = process.env['SOME_ENV_VAR'] !== undefined;
    * }
    * ```
    */
-  active: boolean;
+  readonly active: boolean;
 
   /**
    * The name of the destination
    */
-  name: string;
+  readonly name: string;
 
   /**
    * <h4>Logs a message object at the specified log level to a log destination</h4><br /><br />

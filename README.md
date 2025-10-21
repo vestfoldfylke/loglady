@@ -9,13 +9,19 @@ loglady is an opinionated TypeScript logger developed for and by [vestfoldfylke]
 
 loglady supports the following log destinations out of the box:
 
+- BetterStack
 - Console
 
 The following log destinations are planned before v1.0.0:
 
-- BetterStack
 - File
 - Microsoft Teams
+
+### BetterStack destination
+
+To use the BetterStack log destination, you need to set the following environment variables:
+- `BETTERSTACK_URL`: Your BetterStack Endpoint URL
+- `BETTERSTACK_TOKEN`: The BetterStack token for authentication
 
 ### Add your own log destination
 

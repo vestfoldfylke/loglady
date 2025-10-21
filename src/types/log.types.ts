@@ -18,6 +18,6 @@ export type MessageObject = {
 
 export type TrackedPromise = {
   name: string
-  promise: Promise<void>
+  promise: Promise<void> | Promise<Response>
   isSettled: boolean
 };
