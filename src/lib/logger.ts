@@ -97,14 +97,17 @@ export class Logger {
 
     this._destinations.forEach((destination: LogDestination): void => {
       if (!destination.active) {
+        console.log(`[Logger] Destination ${destination.name} is not active. Skipping.`);
         return;
       }
 
       console.log(`[Logger] Adding promise by ${destination.name} to queue. Current queue length: ${this._queue.length}`);
       this._queue.push(destination.log(messageObject, level));
       console.log(`[Logger] Added promise by ${destination.name} to queue. New queue length: ${this._queue.length}`);
-
-      this.cleanupQueue();
     });
+
+    if (this._queue.length > 0) {
+      this.cleanupQueue();
+    }
   };
 }
