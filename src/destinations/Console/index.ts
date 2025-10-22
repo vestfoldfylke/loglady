@@ -23,24 +23,28 @@ export default class ConsoleDestination implements LogDestination {
   }
 
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
-    // TODO: Log out only message string from messageObject
     switch (level) {
       case 'DEBUG':
-        console.debug(messageObject);
+        console.debug(new Date().toISOString(), messageObject.message);
         break;
       case 'INFO':
-        console.info(messageObject);
+        console.info(new Date().toISOString(), messageObject.message);
         break;
       case 'WARN':
-        console.warn(messageObject);
+        console.warn(new Date().toISOString(), messageObject.message);
         break;
       case 'ERROR':
       case 'CRITICAL':
       case 'FATAL':
-        console.error(messageObject);
+        if (messageObject.exception !== undefined) {
+          console.error(new Date().toISOString(), messageObject.message, '--->', messageObject.exception);
+          break;
+        }
+
+        console.error(new Date().toISOString(), messageObject.message);
         break;
       default:
-        console.log(messageObject);
+        console.log(new Date().toISOString(), messageObject.message);
     }
 
     return {
