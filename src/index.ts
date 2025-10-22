@@ -37,9 +37,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function debug(messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] Debug log called:', _queue.length);
     _logger.log(messageTemplate, 'DEBUG', undefined, ...params);
-    console.log('[Logger] Debug log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -63,9 +61,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function info(messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] Info log called:', _queue.length);
     _logger.log(messageTemplate, 'INFO', undefined, ...params);
-    console.log('[Logger] Info log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -89,9 +85,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function warn(messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] Warn log called:', _queue.length);
     _logger.log(messageTemplate, 'WARN', undefined, ...params);
-    console.log('[Logger] Warn log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -115,9 +109,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function error(messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] Error log called:', _queue.length);
     _logger.log(messageTemplate, 'ERROR', undefined, ...params);
-    console.log('[Logger] Error log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -146,9 +138,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function errorException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] ErrorException log called:', _queue.length);
     _logger.log(messageTemplate, 'ERROR', exception, ...params);
-    console.log('[Logger] ErrorException log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -172,9 +162,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function critical(messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] Critical log called:', _queue.length);
     _logger.log(messageTemplate, 'CRITICAL', undefined, ...params);
-    console.log('[Logger] Critical log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -203,9 +191,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function criticalException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] CriticalException log called:', _queue.length);
     _logger.log(messageTemplate, 'CRITICAL', exception, ...params);
-    console.log('[Logger] CriticalException log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -229,9 +215,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function fatal(messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] Fatal log called:', _queue.length);
     _logger.log(messageTemplate, 'FATAL', undefined, ...params);
-    console.log('[Logger] Fatal log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -259,8 +243,6 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function fatalException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
-    console.log('[Logger] FatalException log called:', _queue.length);
     _logger.log(messageTemplate, 'FATAL', exception, ...params);
-    console.log('[Logger] FatalException log processed:', _queue.length);
   }
 }

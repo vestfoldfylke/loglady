@@ -20,7 +20,6 @@ export class Logger {
     // TODO: Get destinations config from environment variables
 
     const destinationFolders: Dirent[] = readdirSync(new URL('../destinations', import.meta.url), { withFileTypes: true });
-    console.log(`[Logger] Loading destinations: ${destinationFolders.map(destinationFolder => destinationFolder.name).join(', ')}`);
     destinationFolders.forEach((destinationFolder: Dirent): void => {
       import(`../destinations/${destinationFolder.name}/index.js`).then((module) => {
         // TODO: Get environment variables for this destination
@@ -29,7 +28,6 @@ export class Logger {
         // TODO: Pass configuration to destination constructor
         const destinationInstance: LogDestination = new DestinationClass();
         this._destinations.push(destinationInstance);
-        console.log(`[Logger] Loaded destination: ${destinationInstance.name}`);
       });
     });
   };
@@ -43,18 +41,11 @@ export class Logger {
   };
   
   private cleanupQueue = (): void => {
-    console.log(`[Logger] Cleaning up queue. Current queue length: ${this._queue.length}`);
-
     for (let i: number = this._queue.length - 1; i >= 0; i--) {
-      const name = this._queue[i]?.name;
-      console.log(`[Logger] Checking promise by ${name} for cleanup. Is settled: ${this._queue[i]?.isSettled}`);
       if (this._queue[i]?.isSettled) {
         this._queue.splice(i, 1);
-        console.log(`[Logger] Cleaned up settled promise by ${name} from queue. Remaining items: ${this._queue.length}`);
       }
     }
-
-    console.log(`[Logger] Queue cleanup complete. Final queue length: ${this._queue.length}`);
   };
 
   /**
@@ -97,13 +88,10 @@ export class Logger {
 
     this._destinations.forEach((destination: LogDestination): void => {
       if (!destination.active) {
-        console.log(`[Logger] Destination ${destination.name} is not active. Skipping.`);
         return;
       }
 
-      console.log(`[Logger] Adding promise by ${destination.name} to queue. Current queue length: ${this._queue.length}`);
       this._queue.push(destination.log(messageObject, level));
-      console.log(`[Logger] Added promise by ${destination.name} to queue. New queue length: ${this._queue.length}`);
     });
 
     if (this._queue.length > 0) {
