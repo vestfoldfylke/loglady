@@ -91,8 +91,8 @@ export class Logger {
       properties
     };
 
-    if (exception !== undefined) {
-      messageObject.exception = exception;
+    if (exception !== undefined && exception !== null && Object.prototype.hasOwnProperty.call(exception, 'stack')) {
+      messageObject.exception = (exception as Error).stack;
     }
 
     this._destinations.forEach((destination: LogDestination): void => {
