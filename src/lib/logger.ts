@@ -13,19 +13,12 @@ export class Logger {
     
     this.initialize();
   }
-  
-  // TODO: Implement a possibility to change the logConfig at any time, preserving the old config and adding new config on top
 
   private initialize = (): void => {
-    // TODO: Get destinations config from environment variables
-
     const destinationFolders: Dirent[] = readdirSync(new URL('../destinations', import.meta.url), { withFileTypes: true });
     destinationFolders.forEach((destinationFolder: Dirent): void => {
       import(`../destinations/${destinationFolder.name}/index.js`).then((module) => {
-        // TODO: Get environment variables for this destination
         const DestinationClass = module.default;
-
-        // TODO: Pass configuration to destination constructor
         const destinationInstance: LogDestination = new DestinationClass();
         this._destinations.push(destinationInstance);
       });
