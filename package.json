@@ -14,7 +14,7 @@
   "scripts": {
     "build": "tsc",
     "pack": "npm run test && rm -rf dist && npm run build && npm pack",
-    "test": "eslint ."
+    "test": "eslint . && node --import tsx --test tests/**/*.test.ts"
   },
   "repository": {
     "type": "git",
@@ -41,6 +41,7 @@
     "@typescript-eslint/eslint-plugin": "^8.46.1",
     "@typescript-eslint/parser": "^8.46.1",
     "eslint": "^9.38.0",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }
