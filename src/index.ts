@@ -114,7 +114,11 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function error(messageTemplate: string, ...params: MessageParameter[]): void;
+  export function error(messageTemplate: string, ...params: MessageParameter[]): void {
+    console.log('[Logger] Error log called:', _queue.length);
+    _logger.log(messageTemplate, 'ERROR', undefined, ...params);
+    console.log('[Logger] Error log processed:', _queue.length);
+  }
 
   // noinspection JSUnusedGlobalSymbols
   /**
@@ -130,10 +134,10 @@ export namespace logger {
    *   // some code that throws an error
    * } catch (error) {
    *   // with placeholders
-   *   error(error, 'Application {ApplicationName} shut down after {Minutes} minutes', applicationName, minutes);
+   *   errorException(error, 'Application {ApplicationName} shut down after {Minutes} minutes', applicationName, minutes);
    *
    *   // without placeholders
-   *   error(error, 'Application shut down');
+   *   errorException(error, 'Application shut down');
    * }
    * ```
    *
@@ -141,25 +145,10 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function error(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void;
-
-  // noinspection JSUnusedGlobalSymbols
-  export function error(arg1: unknown, arg2: unknown, ...params: MessageParameter[]): void {
-    console.log('[Logger] Error log called:', _queue.length);
-
-    if (typeof arg1 === 'string') {
-      _logger.log(arg1, 'ERROR', undefined, ...params);
-      console.log('[Logger] Error log processed:', _queue.length);
-      return;
-    }
-
-    if (typeof arg2 === 'string') {
-      _logger.log(arg2, 'ERROR', arg1, ...params);
-      console.log('[Logger] Error log processed:', _queue.length);
-      return;
-    }
-
-    throw new Error(`[${new Date().toISOString()}] - Invalid arguments provided to error log`);
+  export function errorException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
+    console.log('[Logger] ErrorException log called:', _queue.length);
+    _logger.log(messageTemplate, 'ERROR', exception, ...params);
+    console.log('[Logger] ErrorException log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -182,7 +171,11 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function critical(messageTemplate: string, ...params: MessageParameter[]): void;
+  export function critical(messageTemplate: string, ...params: MessageParameter[]): void {
+    console.log('[Logger] Critical log called:', _queue.length);
+    _logger.log(messageTemplate, 'CRITICAL', undefined, ...params);
+    console.log('[Logger] Critical log processed:', _queue.length);
+  }
 
   // noinspection JSUnusedGlobalSymbols
   /**
@@ -198,10 +191,10 @@ export namespace logger {
    *   // some code that throws an error
    * } catch (error) {
    *   // with placeholders
-   *   critical(error, 'Application {ApplicationName} shut down after {Minutes} minutes', applicationName, minutes);
+   *   criticalException(error, 'Application {ApplicationName} shut down after {Minutes} minutes', applicationName, minutes);
    *
    *   // without placeholders
-   *   critical(error, 'Application shut down');
+   *   criticalException(error, 'Application shut down');
    * }
    * ```
    *
@@ -209,25 +202,10 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function critical(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void;
-
-  // noinspection JSUnusedGlobalSymbols
-  export function critical(arg1: unknown, arg2: unknown, ...params: MessageParameter[]): void {
-    console.log('[Logger] Critical log called:', _queue.length);
-
-    if (typeof arg1 === 'string') {
-      _logger.log(arg1, 'CRITICAL', undefined, ...params);
-      console.log('[Logger] Critical log processed:', _queue.length);
-      return;
-    }
-
-    if (typeof arg2 === 'string') {
-      _logger.log(arg2, 'CRITICAL', arg1, ...params);
-      console.log('[Logger] Critical log processed:', _queue.length);
-      return;
-    }
-
-    throw new Error(`[${new Date().toISOString()}] - Invalid arguments provided to critical log`);
+  export function criticalException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
+    console.log('[Logger] CriticalException log called:', _queue.length);
+    _logger.log(messageTemplate, 'CRITICAL', exception, ...params);
+    console.log('[Logger] CriticalException log processed:', _queue.length);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -250,7 +228,11 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function fatal(messageTemplate: string, ...params: MessageParameter[]): void;
+  export function fatal(messageTemplate: string, ...params: MessageParameter[]): void {
+    console.log('[Logger] Fatal log called:', _queue.length);
+    _logger.log(messageTemplate, 'FATAL', undefined, ...params);
+    console.log('[Logger] Fatal log processed:', _queue.length);
+  }
 
   // noinspection JSUnusedGlobalSymbols
   /**
@@ -265,10 +247,10 @@ export namespace logger {
    *   // some code that throws an error
    * } catch (error) {
    *   // with placeholders
-   *   fatal(error, 'Application {ApplicationName} terminated', applicationName);
+   *   fatalException(error, 'Application {ApplicationName} terminated', applicationName);
    *
    *   // without placeholders
-   *   fatal(error, 'Application terminated');
+   *   fatalException(error, 'Application terminated');
    * }
    * ```
    *
@@ -276,24 +258,9 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function fatal(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void;
-
-  // noinspection JSUnusedGlobalSymbols
-  export function fatal(arg1: unknown, arg2: unknown, ...params: MessageParameter[]): void {
-    console.log('[Logger] FATAL log called:', _queue.length);
-
-    if (typeof arg1 === 'string') {
-      _logger.log(arg1, 'FATAL', undefined, ...params);
-      console.log('[Logger] FATAL log processed:', _queue.length);
-      return;
-    }
-
-    if (typeof arg2 === 'string') {
-      _logger.log(arg2, 'FATAL', arg1, ...params);
-      console.log('[Logger] FATAL log processed:', _queue.length);
-      return;
-    }
-
-    throw new Error(`[${new Date().toISOString()}] - Invalid arguments provided to fatal log`);
+  export function fatalException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
+    console.log('[Logger] FatalException log called:', _queue.length);
+    _logger.log(messageTemplate, 'FATAL', exception, ...params);
+    console.log('[Logger] FatalException log processed:', _queue.length);
   }
 }
