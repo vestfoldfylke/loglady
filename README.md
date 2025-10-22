@@ -20,7 +20,7 @@ The following log destinations are planned before v1.0.0:
 ### BetterStack destination
 
 To use the BetterStack log destination, you need to set the following environment variables:
-- `BETTERSTACK_URL`: Your BetterStack Endpoint URL
+- `BETTERSTACK_URL`: Your BetterStack endpoint URL
 - `BETTERSTACK_TOKEN`: The BetterStack token for authentication
 
 ### Console destination
@@ -50,19 +50,19 @@ import { logger } from '@vestfoldfylke/loglady';
 logger.debug('This is a debug message');
 logger.info('This is an info message for UserName {UserName}', 'john.doe');
 logger.warn('This is a warning message');
-
-// error, fatal and critical log functions also support logging exceptions
 logger.error('This is an error message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-logger.error(error, 'This is an error message with an exception but without additional parameters');
-logger.error(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
-
 logger.fatal('This is a fatal message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-logger.fatal(error, 'This is a fatal message with an exception but without additional parameters');
-logger.fatal(error, 'This is a fatal message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
-
 logger.critical('This is a critical message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-logger.critical(error, 'This is a critical message with an exception but without additional parameters');
-logger.critical(error, 'This is a critical message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
+
+// errorException, fatalException and criticalException log functions also support logging an exception
+logger.errorException(error, 'This is an error message with an exception but without additional parameters');
+logger.errorException(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
+
+logger.fatalException(error, 'This is a fatal message with an exception but without additional parameters');
+logger.fatalException(error, 'This is a fatal message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
+
+logger.criticalException(error, 'This is a critical message with an exception but without additional parameters');
+logger.criticalException(error, 'This is a critical message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
 // flush any log messages not completed yet (if applicable)
 await logger.flush();
