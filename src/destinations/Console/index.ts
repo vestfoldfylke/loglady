@@ -42,26 +42,28 @@ export default class ConsoleDestination implements LogDestination {
       };
     }
 
+    const levelString: string = `[${level}]`;
+
     switch (level) {
       case 'DEBUG':
-        console.debug(new Date().toISOString(), messageObject.message);
+        console.debug(new Date().toISOString(), levelString, messageObject.message);
         break;
       case 'INFO':
-        console.info(new Date().toISOString(), messageObject.message);
+        console.info(new Date().toISOString(), levelString, messageObject.message);
         break;
       case 'WARN':
-        console.warn(new Date().toISOString(), messageObject.message);
+        console.warn(new Date().toISOString(), levelString, messageObject.message);
         break;
       case 'ERROR':
         if (messageObject.exception !== undefined) {
-          console.error(new Date().toISOString(), messageObject.message, '--->', messageObject.exception);
+          console.error(new Date().toISOString(), levelString, messageObject.message, '--->', messageObject.exception);
           break;
         }
 
-        console.error(new Date().toISOString(), messageObject.message);
+        console.error(new Date().toISOString(), levelString, messageObject.message);
         break;
       default:
-        console.log(new Date().toISOString(), messageObject.message);
+        console.log(new Date().toISOString(), levelString, messageObject.message);
     }
 
     return {
