@@ -1,6 +1,8 @@
 import type { LogDestination } from '../../types/LogDestination.types';
 import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
 
+import { canLogAtLevel } from '../../lib/log-level.js';
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
@@ -8,7 +10,9 @@ import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.ty
  * LogDestination that logs to BetterStack<br /><br />
  * 
  * **active**: `true` only when **BETTERSTACK_URL** and **BETTERSTACK_TOKEN** are specified as environment variables<br />
- * **name**: 'BetterStack'
+ * **name**: 'BetterStack'<br /><br >
+ *
+ * Minimum log level defaults to `INFO` but can be customized by specifying the **BETTERSTACK_MIN_LOG_LEVEL** environment variable
  */
 export default class BetterStackDestination implements LogDestination {
   readonly active: boolean;
@@ -17,6 +21,7 @@ export default class BetterStackDestination implements LogDestination {
   private readonly _endpoint: string | undefined;
   private readonly _token: string | undefined;
 
+  private readonly _minLogLevel: LogLevel;
   // @ts-ignore - This comment can be removed when _pkg is used
   private readonly _pkg: unknown;
 
@@ -24,6 +29,7 @@ export default class BetterStackDestination implements LogDestination {
     this._endpoint = process.env['BETTERSTACK_URL'];
     this._token = process.env['BETTERSTACK_TOKEN'];
 
+    this._minLogLevel = (process.env['BETTERSTACK_MIN_LOG_LEVEL'] as LogLevel) || 'INFO';
     this._pkg = pkg;
 
     this.active = this._endpoint !== undefined && this._token !== undefined;
@@ -38,6 +44,14 @@ export default class BetterStackDestination implements LogDestination {
   };
 
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
+    if (!canLogAtLevel(level, this._minLogLevel)) {
+      return {
+        name: this.name,
+        promise: Promise.resolve(),
+        isSettled: true
+      };
+    }
+
     const betterStackMessage: unknown = this.createMessage(messageObject, level);
 
     const promise: Promise<Response> = fetch(this._endpoint as string, {

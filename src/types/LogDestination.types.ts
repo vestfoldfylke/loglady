@@ -8,22 +8,38 @@ import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
  * The callers package.json file will be imported and passed to the constructor of the implementing class<br /><br />
  * 
  * Example implementation:
- * ```typescript *
+ * ```typescript
+ * import type { LogDestination } from '../../types/LogDestination.types';
+ * import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
+ *
+ * import { canLogAtLevel } from '../../lib/log-level.js';
+ *
  * export default class CustomDestination implements LogDestination {
  *   readonly active: boolean;
  *   readonly name: string = '%DestinationNameHere%';
  *   
+ *   private readonly _minLogLevel: LogLevel;
  *   // @ts-ignore - This comment can be removed when _pkg is used
  *   private readonly _pkg: unknown;
  * 
  *   constructor(pkg: unknown) {
  *     this.active = process.env['SOME_ENV'] !== undefined;
  *     
+ *     this._minLogLevel = (process.env['SOME_ENV_MIN_LOG_LEVEL'] as LogLevel) || 'ERROR';
  *     this._pkg = pkg;
  *   }
  * 
  *   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
+ *     if (!canLogAtLevel(level, this._minLogLevel)) {
+ *       return {
+ *         name: this.name,
+ *         promise: Promise.resolve(),
+ *         isSettled: true
+ *       };
+ *     }
+ *
  *     // Custom logging logic here
+ *
  *     return {
  *       name: this.name,
  *       promise: Promise.resolve(),

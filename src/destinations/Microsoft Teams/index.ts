@@ -2,6 +2,8 @@ import type { LogDestination } from '../../types/LogDestination.types';
 import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
 import type { MicrosoftTeamsColor } from '../../types/microsoft-teams-color';
 
+import { canLogAtLevel } from '../../lib/log-level.js';
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
@@ -9,17 +11,21 @@ import type { MicrosoftTeamsColor } from '../../types/microsoft-teams-color';
  * LogDestination that logs to Microsoft Teams<br /><br />
  * 
  * **active**: `true` only when **TEAMS_WEBHOOK_URL** is specified as an environment variable<br />
- * **name**: 'Microsoft Teams'
+ * **name**: 'Microsoft Teams'<br /><br >
+ * 
+ * Minimum log level defaults to `ERROR` but can be customized by specifying the **TEAMS_MIN_LOG_LEVEL** environment variable
  */
 export default class MicrosoftTeamsDestination implements LogDestination {
   readonly active: boolean;
   readonly name: string = 'Microsoft Teams';
 
+  private readonly _minLogLevel: LogLevel;
   // @ts-ignore - This comment can be removed when _pkg is used
   private readonly _pkg: unknown;
   private readonly _webhookUrl: string | undefined;
 
   constructor(pkg: unknown) {
+    this._minLogLevel = (process.env['TEAMS_MIN_LOG_LEVEL'] as LogLevel) || 'ERROR';
     this._pkg = pkg;
     this._webhookUrl = process.env['TEAMS_WEBHOOK_URL'];
 
@@ -211,6 +217,14 @@ export default class MicrosoftTeamsDestination implements LogDestination {
   }
 
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
+    if (!canLogAtLevel(level, this._minLogLevel)) {
+      return {
+        name: this.name,
+        promise: Promise.resolve(),
+        isSettled: true
+      };
+    }
+
     const color: MicrosoftTeamsColor = this.getAdaptiveCardColor(level);
     const repositoryString: string | undefined = this.getRepositoryString();
     const title: string | undefined = this.getAdaptiveCardTitle(level);
