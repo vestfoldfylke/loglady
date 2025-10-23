@@ -7,9 +7,16 @@ const levelMapper = {
   ERROR: 3
 };
 
-export function canLogAtLevel(messageLevel: LogLevel, minimumLogLevel: LogLevel): boolean {
-  const messageLevelValue: number = levelMapper[messageLevel as keyof typeof levelMapper];
+export function canLogAtLevel(messageLogLevel: LogLevel, minimumLogLevel: LogLevel): boolean {
+  const messageLevelValue: number = levelMapper[messageLogLevel as keyof typeof levelMapper];
+  if (messageLevelValue === undefined) {
+    throw new Error(`Invalid message log level: ${messageLogLevel}`);
+  }
+
   const minimumLogLevelValue: number = levelMapper[minimumLogLevel as keyof typeof levelMapper];
+  if (minimumLogLevelValue === undefined) {
+    throw new Error(`Invalid minimum log level: ${minimumLogLevel}`);
+  }
 
   return messageLevelValue >= minimumLogLevelValue;
 }
