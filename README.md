@@ -11,11 +11,11 @@ loglady supports the following log destinations out of the box:
 
 - BetterStack
 - Console
+- Microsoft Teams
 
-The following log destinations are planned before v1.0.0:
+The following log destinations are planned after v1.0.0:
 
 - File
-- Microsoft Teams
 
 ### BetterStack destination
 
@@ -27,6 +27,11 @@ To use the BetterStack log destination, you need to set the following environmen
 
 The Console log destination is enabled by default. You can disable it by setting the following environment variable:
 - `CONSOLE_ENABLED`: Set to `false` to disable console logging
+
+### Microsoft Teams destination
+
+To use the Microsoft Teams log destination, you need to set the following environment variables:
+- `TEAMS_WEBHOOK_URL`: Your Microsoft Teams webhook URL
 
 ### Add your own log destination
 
