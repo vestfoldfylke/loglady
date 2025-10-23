@@ -17,9 +17,14 @@ export default class BetterStackDestination implements LogDestination {
   private readonly _endpoint: string | undefined;
   private readonly _token: string | undefined;
 
-  constructor() {
+  // @ts-ignore - This comment can be removed when _pkg is used
+  private readonly _pkg: unknown;
+
+  constructor(pkg: unknown) {
     this._endpoint = process.env['BETTERSTACK_URL'];
     this._token = process.env['BETTERSTACK_TOKEN'];
+
+    this._pkg = pkg;
 
     this.active = this._endpoint !== undefined && this._token !== undefined;
   }

@@ -14,8 +14,13 @@ export default class ConsoleDestination implements LogDestination {
   readonly active: boolean;
   readonly name: string = 'Console';
 
-  constructor() {
+  // @ts-ignore - This comment can be removed when _pkg is used
+  private readonly _pkg: unknown;
+
+  constructor(pkg: unknown) {
     const active: string | boolean | undefined = process.env['CONSOLE_ENABLED'];
+
+    this._pkg = pkg;
 
     this.active = active === undefined
       ? true

@@ -1,5 +1,7 @@
 import { readdirSync } from 'fs';
 
+import { getPackageJson } from './get-package-json.js';
+
 import type { Dirent } from 'node:fs';
 import type { LogDestination } from '../types/LogDestination.types';
 import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../types/log.types';
@@ -10,16 +12,18 @@ export class Logger {
 
   constructor(queue: TrackedPromise[]) {
     this._queue = queue ?? [];
-    
+
     this.initialize();
   }
 
   private initialize = (): void => {
+    const pkg: unknown = getPackageJson();
     const destinationFolders: Dirent[] = readdirSync(new URL('../destinations', import.meta.url), { withFileTypes: true });
+
     destinationFolders.forEach((destinationFolder: Dirent): void => {
       import(`../destinations/${destinationFolder.name}/index.js`).then((module) => {
         const DestinationClass = module.default;
-        const destinationInstance: LogDestination = new DestinationClass();
+        const destinationInstance: LogDestination = new DestinationClass(pkg);
         this._destinations.push(destinationInstance);
       });
     });

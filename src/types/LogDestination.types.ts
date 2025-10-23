@@ -1,5 +1,38 @@
 import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
 
+/**
+ * Interface for a log destination<br /><br />
+ * 
+ * Implement this interface to create a custom log destination for the loglady 🪵<br /><br />
+ * 
+ * The callers package.json file will be imported and passed to the constructor of the implementing class<br /><br />
+ * 
+ * Example implementation:
+ * ```typescript *
+ * export default class CustomDestination implements LogDestination {
+ *   readonly active: boolean;
+ *   readonly name: string = '%DestinationNameHere%';
+ *   
+ *   // @ts-ignore - This comment can be removed when _pkg is used
+ *   private readonly _pkg: unknown;
+ * 
+ *   constructor(pkg: unknown) {
+ *     this.active = process.env['SOME_ENV'] !== undefined;
+ *     
+ *     this._pkg = pkg;
+ *   }
+ * 
+ *   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
+ *     // Custom logging logic here
+ *     return {
+ *       name: this.name,
+ *       promise: Promise.resolve(),
+ *       isSettled: true
+ *     };
+ *   }
+ * }
+ * ```
+ */
 export interface LogDestination {
   /**
    * Indicates whether the destination is active and should receive log messages. Can be overridden by environment variables (check README)<br /><br />
