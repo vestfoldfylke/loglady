@@ -182,7 +182,8 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       adaptiveCard.attachments[0]!.content.body[0]!.columns[0]!.items.push({
         type: 'CodeBlock',
         // @ts-ignore
-        codeSnippet: messageObject.exception
+        codeSnippet: messageObject.exception,
+        language: 'JavaScript'
       });
     }
     
