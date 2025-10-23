@@ -7,15 +7,7 @@ const logFunctions = {
   debug: logger.debug,
   info: logger.info,
   warn: logger.warn,
-  error: logger.error,
-  critical: logger.critical,
-  fatal: logger.fatal
-};
-
-const logExceptionFunctions = {
-  errorException: logger.errorException,
-  criticalException: logger.criticalException,
-  fatalException: logger.fatalException
+  error: logger.error
 };
 
 describe('loglady 🪵  should not throw errors during logging', () => {
@@ -29,14 +21,12 @@ describe('loglady 🪵  should not throw errors during logging', () => {
     });
   });
 
-  Object.entries(logExceptionFunctions).forEach(([level, logExceptionFunction]) => {
-    it(`when "${level}" is called with exception and messageTemplate only`, () => {
-      assert.doesNotThrow(() => logExceptionFunction.call(logger, new Error('Test'), `This is ${level} message`));
-    });
+  it('when "error" is called with exception and messageTemplate only', () => {
+    assert.doesNotThrow(() => logger.errorException(new Error('Test'), 'This is an error message'));
+  });
 
-    it(`when "${level}" is called with exception, messageTemplate and 1 parameter`, () => {
-      assert.doesNotThrow(() => logExceptionFunction.call(logger, new Error('Test'), `This is ${level} message: {Message}`, 'loglady test'));
-    });
+  it('when "error" is called with exception, messageTemplate and 1 parameter', () => {
+    assert.doesNotThrow(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}', 'loglady test'));
   });
 });
 
@@ -51,13 +41,11 @@ describe('loglady 🪵  should throw errors during logging', () => {
     });
   });
 
-  Object.entries(logExceptionFunctions).forEach(([level, logExceptionFunction]) => {
-    it(`when "${level}" is called with exception and messageTemplate with 1 placeholder but 0 parameters`, () => {
-      assert.throws(() => logExceptionFunction.call(logger, new Error('Test'), `This is ${level} message: {Message}`));
-    });
+  it('when "error" is called with exception and messageTemplate with 1 placeholder but 0 parameters', () => {
+    assert.throws(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}'));
+  });
 
-    it(`when "${level}" is called with exception and messageTemplate with 1 placeholder but 2 parameters`, () => {
-      assert.throws(() => logExceptionFunction.call(logger, new Error('Test'), `This is ${level} message: {Message}`, 'loglady test', 'makes no sense'));
-    });
+  it('when "error" is called with exception and messageTemplate with 1 placeholder but 2 parameters', () => {
+    assert.throws(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}', 'loglady test', 'makes no sense'));
   });
 });

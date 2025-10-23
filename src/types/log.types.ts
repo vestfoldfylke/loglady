@@ -1,4 +1,4 @@
-export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR' | 'CRITICAL' | 'FATAL';
+export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
 export type MessageParameter = string | number | bigint | boolean | object | [];
 

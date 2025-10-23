@@ -41,8 +41,6 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       case 'WARN':
         return 'warning';
       case 'ERROR':
-      case 'CRITICAL':
-      case 'FATAL':
         return 'attention';
       default:
         return 'default';

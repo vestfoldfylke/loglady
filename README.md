@@ -22,8 +22,6 @@ The following log levels are supported and can be set as the minimum log level f
 - INFO
 - WARN
 - ERROR
-- FATAL
-- CRITICAL
 
 ### BetterStack destination
 
@@ -79,18 +77,10 @@ logger.debug('This is a debug message');
 logger.info('This is an info message for UserName {UserName}', 'john.doe');
 logger.warn('This is a warning message');
 logger.error('This is an error message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-logger.fatal('This is a fatal message without an exception with ErrorMessage: {ErrorMessage}', error.message);
-logger.critical('This is a critical message without an exception with ErrorMessage: {ErrorMessage}', error.message);
 
-// errorException, fatalException and criticalException log functions also support logging an exception
+// errorException log function supports logging an exception as well
 logger.errorException(error, 'This is an error message with an exception but without additional parameters');
 logger.errorException(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
-
-logger.fatalException(error, 'This is a fatal message with an exception but without additional parameters');
-logger.fatalException(error, 'This is a fatal message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
-
-logger.criticalException(error, 'This is a critical message with an exception but without additional parameters');
-logger.criticalException(error, 'This is a critical message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
 // flush any log messages not completed yet (if applicable)
 await logger.flush();

@@ -53,8 +53,6 @@ export default class ConsoleDestination implements LogDestination {
         console.warn(new Date().toISOString(), messageObject.message);
         break;
       case 'ERROR':
-      case 'CRITICAL':
-      case 'FATAL':
         if (messageObject.exception !== undefined) {
           console.error(new Date().toISOString(), messageObject.message, '--->', messageObject.exception);
           break;
