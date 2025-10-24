@@ -1,3 +1,11 @@
+export type CallingInfo = {
+  functionName: string
+  fileName: string
+  filePath: string
+  lineNumber: number
+  columnNumber: number
+}
+
 export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
 export type MessageParameter = string | number | bigint | boolean | object | [];

@@ -5,7 +5,7 @@ import MicrosoftTeamsDestination from '../destinations/Microsoft Teams/index.js'
 import { getPackageJson } from './get-package-json.js';
 
 import type { LogDestination } from '../types/LogDestination.types';
-import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../types/log.types';
+import type { CallingInfo, LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../types/log.types';
 
 export class Logger {
   protected _destinations: LogDestination[] = [];
@@ -36,6 +36,50 @@ export class Logger {
         this._queue.splice(i, 1);
       }
     }
+  };
+  
+  private getCallingInfo = (): CallingInfo | undefined => {
+    const error = new Error();
+    const stackLines = error.stack?.split('\n').slice(4, 5) ?? [];
+    if (stackLines.length === 0) {
+      return undefined;
+    }
+
+    const line = stackLines[0];
+    if (line === undefined) {
+      return undefined;
+    }
+
+    const match = line.match(/\s*at\s+(.*)\s+\((.*):(\d+):(\d+)\)/) || line.match(/\s*at\s+(.*):(\d+):(\d+)/);
+    if (!match) {
+      return undefined;
+    }
+
+    const functionName: string = match.length >= 5
+      ? match[1] as string
+      : '<anonymous>';
+
+    const filePath: string = match.length >= 5
+      ? match[2] as string
+      : match[1] as string;
+
+    const fileName: string = filePath?.replace(process.cwd(), '').replace(/(^\/+)|(^\\+)/, '').replace('file:///', '') ?? undefined;
+
+    const lineNumber = match.length >= 5
+      ? parseInt(match[3] as string, 10)
+      : parseInt(match[2] as string, 10);
+
+    const columnNumber = match.length >= 5
+      ? parseInt(match[4] as string, 10)
+      : parseInt(match[3] as string, 10);
+
+    return {
+      functionName,
+      fileName,
+      filePath,
+      lineNumber,
+      columnNumber
+    };
   };
 
   /**
@@ -74,6 +118,11 @@ export class Logger {
 
     if (exception !== undefined && exception !== null && Object.prototype.hasOwnProperty.call(exception, 'stack')) {
       messageObject.exception = (exception as Error).stack;
+    }
+
+    const callingInfo: CallingInfo | undefined = this.getCallingInfo();
+    if (callingInfo !== undefined) {
+      messageObject.properties['CallingInfo'] = callingInfo;
     }
 
     this._destinations.forEach((destination: LogDestination): void => {
