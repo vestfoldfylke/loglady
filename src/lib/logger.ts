@@ -1,8 +1,9 @@
-import { readdirSync } from 'fs';
+import ConsoleDestination from '../destinations/Console/index.js';
+import BetterStackDestination from '../destinations/BetterStack/index.js';
+import MicrosoftTeamsDestination from '../destinations/Microsoft Teams/index.js';
 
 import { getPackageJson } from './get-package-json.js';
 
-import type { Dirent } from 'node:fs';
 import type { LogDestination } from '../types/LogDestination.types';
 import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../types/log.types';
 
@@ -13,21 +14,13 @@ export class Logger {
   constructor(queue: TrackedPromise[]) {
     this._queue = queue ?? [];
 
-    this.initialize();
-  }
-
-  private initialize = (): void => {
     const pkg: unknown = getPackageJson();
-    const destinationFolders: Dirent[] = readdirSync(new URL('../destinations', import.meta.url), { withFileTypes: true });
-
-    destinationFolders.forEach((destinationFolder: Dirent): void => {
-      import(`../destinations/${destinationFolder.name}/index.js`).then((module) => {
-        const DestinationClass = module.default;
-        const destinationInstance: LogDestination = new DestinationClass(pkg);
-        this._destinations.push(destinationInstance);
-      });
-    });
-  };
+    this._destinations.push(...[
+      new ConsoleDestination(pkg),
+      new BetterStackDestination(pkg),
+      new MicrosoftTeamsDestination(pkg)
+    ]);
+  }
 
   private getParameterValue = (param: string, value: MessageParameter): string => {
     if (param.startsWith('@') && (typeof value === 'object' || Array.isArray(value))) {

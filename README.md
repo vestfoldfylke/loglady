@@ -7,15 +7,11 @@ loglady 🪵 is an opinionated, 0 dependency, TypeScript logger developed for an
 
 ## Log destinations
 
-loglady 🪵 supports the following log destinations out of the box:
+loglady 🪵 supports the following log destinations:
 
 - BetterStack
 - Console
 - Microsoft Teams
-
-The following log destinations are planned after v1.0.0:
-
-- File
 
 The following log levels are supported and can be set as the minimum log level for each destination that supports an environment variable for this:
 - DEBUG
@@ -50,10 +46,11 @@ loglady 🪵 is built with extensibility in mind. A new log destination can be c
 2. Create a new class that implements the `LogDestination` interface. Name the class according to the destination name (e.g. `ConsoleDestination`).
 3. Remember to export your class as default, otherwise loglady 🪵 won't be able to instantiate it.
 4. Implement the required properties and method(s).
+5. Import the new destination class in `src/index.ts` and add it to the `destinations` array in the `Logger` class constructor.
 
 > [!CAUTION]
-> Make sure that your `log` function sets the `isSettled` property to `true` when the promise is settled.<br />
-> <b><u>If `isSettled` is not set to `true`, the logger's flush function will hang indefinitely!</u></b>
+> If your `log` function calls something asynchronously, make sure that your `log` function sets the `isSettled` property on the **TrackedPromise** to `true` when the promise is settled.<br />
+> <b><u>If `isSettled` is never set to `true`, the logger's flush function will hang indefinitely!</u></b>
 
 ## Usage
 
@@ -82,6 +79,6 @@ logger.error('This is an error message without an exception with ErrorMessage: {
 logger.errorException(error, 'This is an error message with an exception but without additional parameters');
 logger.errorException(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
-// flush any log messages not completed yet (if applicable)
+// flush any log messages not completed yet (applicable if asynchronous log destinations are used). If not called, the application may exit before all log messages are sent.
 await logger.flush();
 ```
