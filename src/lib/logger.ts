@@ -13,11 +13,15 @@ export class Logger {
   constructor(queue: TrackedPromise[]) {
     this._queue = queue ?? [];
 
-    this.initialize();
+    this.initialize()
+      .catch((error: unknown): void => {
+        console.error(`[${new Date().toISOString()}] - Error initializing Logger:`, error);
+      });
   }
 
-  private initialize = (): void => {
-    const pkg: unknown = getPackageJson();
+  private initialize = async (): Promise<void> => {
+    const pkg: unknown = await getPackageJson();
+    // TODO: import.meta.url only works in EMS
     const destinationFolders: Dirent[] = readdirSync(new URL('../destinations', import.meta.url), { withFileTypes: true });
 
     destinationFolders.forEach((destinationFolder: Dirent): void => {
