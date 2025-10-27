@@ -44,7 +44,11 @@ export class Logger {
 
     const callingInfo: CallingInfo | undefined = this.getCallingInfo();
     if (callingInfo !== undefined) {
-      properties['CallingInfo'] = callingInfo;
+      properties['FunctionName'] = callingInfo.functionName;
+      properties['FileName'] = callingInfo.fileName;
+      properties['FilePath'] = callingInfo.filePath;
+      properties['LineNumber'] = callingInfo.lineNumber;
+      properties['ColumnNumber'] = callingInfo.columnNumber;
     }
 
     return properties;
