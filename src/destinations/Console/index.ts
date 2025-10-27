@@ -1,5 +1,6 @@
 import type { LogDestination } from '../../types/LogDestination.types';
 import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
+import type { MinimalPackage } from '../../types/minimal-package.types';
 
 import { canLogAtLevel } from '../../lib/log-level.js';
 
@@ -20,9 +21,9 @@ export default class ConsoleDestination implements LogDestination {
 
   private readonly _minLogLevel: LogLevel;
   // @ts-ignore - This comment can be removed when _pkg is used
-  private readonly _pkg: unknown;
+  private readonly _pkg: MinimalPackage;
 
-  constructor(pkg: unknown) {
+  constructor(pkg: MinimalPackage) {
     const active: string | boolean | undefined = process.env['CONSOLE_ENABLED'];
 
     this._minLogLevel = (process.env['CONSOLE_MIN_LOG_LEVEL'] as LogLevel) || 'DEBUG';
