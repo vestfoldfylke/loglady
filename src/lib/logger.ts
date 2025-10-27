@@ -68,12 +68,12 @@ export class Logger {
   
   private getCallingInfo = (): CallingInfo | undefined => {
     const error = new Error();
-    const stackLines = error.stack?.split('\n').slice(4, 5) ?? [];
-    if (stackLines.length === 0) {
+    const stackSplit = error.stack?.split('\n').filter(line => !line.includes('node_modules')) ?? [];
+    if (stackSplit.length < 2) {
       return undefined;
     }
 
-    const line = stackLines[0];
+    const line = stackSplit[1];
     if (line === undefined) {
       return undefined;
     }
