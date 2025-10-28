@@ -94,42 +94,25 @@ export default class MicrosoftTeamsDestination implements LogDestination {
             },
             body: [
               {
-                type: 'ColumnSet',
-                columns: [
-                  {
-                    type: 'Column',
-                    width: 'stretch',
-                    items: [
-                      {
-                        type: 'TextBlock',
-                        text: title,
-                        color,
-                        weight: 'Bolder',
-                        style: 'heading'
-                      },
-                      {
-                        type: 'ColumnSet',
-                        targetWidth: 'AtLeast:Standard',
-                        columns: [
-                          {
-                            type: 'Column',
-                            width: 'auto',
-                            items: [
-                              {
-                                type: 'TextBlock',
-                                text: messageObject.message,
-                                wrap: true
-                              } // add properties underneath here (if any)
-                            ],
-                            spacing: 'None',
-                            verticalContentAlignment: 'Center'
-                          }
-                        ]
-                      } // add exception underneath here (if any)
-                    ]
-                  }
-                ]
-              } // add repository underneath here (if any)
+                type: 'TextBlock',
+                size: 'Large',
+                weight: 'Bolder',
+                text: title,
+                color
+              },
+              {
+                type: 'TextBlock',
+                text: messageObject.message,
+                wrap: true
+              },
+              {
+                type: 'FactSet',
+                spacing: 'Small',
+                separator: true,
+                facts: [] // add properties in here (if any)
+              }
+              // add exception header and message here (if any)
+              // add repository underneath here (if any)
             ]
           }
         }
@@ -137,47 +120,35 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     };
 
     Object.entries(messageObject.properties).forEach(([key, value]) => {
-      adaptiveCard.attachments[0]!.content.body[0]!.columns[0]!.items[1]!.columns![0]!.items.push({
-        type: 'ColumnSet',
-        // @ts-ignore
-        targetWidth: 'AtLeast:Standard',
-        columns: [
-          {
-            type: 'Column',
-            width: 'auto',
-            items: [
-              {
-                type: 'TextBlock',
-                text: '- ',
-                wrap: true
-              }
-            ],
-            spacing: 'None',
-            verticalContentAlignment: 'Center'
-          },
-          {
-            type: 'Column',
-            width: 'auto',
-            items: [
-              {
-                type: 'TextBlock',
-                text: `${key} : ${value}`,
-                wrap: true
-              }
-            ],
-            spacing: 'None',
-            verticalContentAlignment: 'Center'
-          }
-        ]
+      // @ts-ignore
+      adaptiveCard.attachments[0]!.content.body[2]!.facts!.push({
+        title: `${key}:`,
+        value
       });
     });
     
     if (messageObject.exception !== undefined) {
-      adaptiveCard.attachments[0]!.content.body[0]!.columns[0]!.items.push({
-        type: 'CodeBlock',
-        // @ts-ignore
-        codeSnippet: messageObject.exception,
-        language: 'JavaScript'
+      // @ts-ignore
+      adaptiveCard.attachments[0]!.content.body.push({
+        type: 'TextBlock',
+        text: 'Exception',
+        wrap: true,
+        separator: true,
+        maxLines: 1,
+        fontType: 'Monospace',
+        size: 'Large',
+        weight: 'Bolder',
+        color: 'Default'
+      });
+
+      // @ts-ignore
+      adaptiveCard.attachments[0]!.content.body.push({
+        type: 'TextBlock',
+        text: messageObject.exception,
+        wrap: true,
+        spacing: 'None',
+        fontType: 'Monospace',
+        size: 'Small'
       });
     }
     
@@ -185,6 +156,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       if (/^https:\/\//.test(repositoryString)) {
         adaptiveCard.attachments[0]!.content.body.push({
           type: 'ActionSet',
+          separator: true,
           // @ts-ignore
           actions: [
             {
@@ -198,9 +170,10 @@ export default class MicrosoftTeamsDestination implements LogDestination {
         return adaptiveCard;
       }
 
+      // @ts-ignore
       adaptiveCard.attachments[0]!.content.body.push({
         type: 'TextBlock',
-        // @ts-ignore
+        separator: true,
         text: `Repository: ${repositoryString}`,
         wrap: true
       });
