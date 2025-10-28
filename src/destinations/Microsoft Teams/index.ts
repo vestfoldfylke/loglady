@@ -151,33 +151,35 @@ export default class MicrosoftTeamsDestination implements LogDestination {
         size: 'Small'
       });
     }
-    
-    if (repositoryString !== undefined) {
-      if (/^https:\/\//.test(repositoryString)) {
-        adaptiveCard.attachments[0]!.content.body.push({
-          type: 'ActionSet',
-          separator: true,
-          // @ts-ignore
-          actions: [
-            {
-              type: 'Action.OpenUrl',
-              title: 'Repository',
-              url: repositoryString
-            }
-          ]
-        });
 
-        return adaptiveCard;
-      }
-
-      // @ts-ignore
-      adaptiveCard.attachments[0]!.content.body.push({
-        type: 'TextBlock',
-        separator: true,
-        text: `Repository: ${repositoryString}`,
-        wrap: true
-      });
+    if (repositoryString === undefined) {
+      return adaptiveCard;
     }
+
+    if (/^https:\/\//.test(repositoryString)) {
+      adaptiveCard.attachments[0]!.content.body.push({
+        type: 'ActionSet',
+        separator: true,
+        // @ts-ignore
+        actions: [
+          {
+            type: 'Action.OpenUrl',
+            title: 'Repository',
+            url: repositoryString
+          }
+        ]
+      });
+
+      return adaptiveCard;
+    }
+
+    // @ts-ignore
+    adaptiveCard.attachments[0]!.content.body.push({
+      type: 'TextBlock',
+      separator: true,
+      text: `Repository: ${repositoryString}`,
+      wrap: true
+    });
 
     return adaptiveCard;
   }
