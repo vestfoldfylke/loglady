@@ -11,6 +11,7 @@ import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
  * ```typescript
  * import type { LogDestination } from '../../types/LogDestination.types';
  * import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
+ * import type { MinimalPackage } from '../../types/minimal-package.types';
  *
  * import { canLogAtLevel } from '../../lib/log-level.js';
  *
@@ -20,9 +21,9 @@ import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
  *   
  *   private readonly _minLogLevel: LogLevel;
  *   // @ts-ignore - This comment can be removed when _pkg is used
- *   private readonly _pkg: unknown;
+ *   private readonly _pkg: MinimalPackage;
  * 
- *   constructor(pkg: unknown) {
+ *   constructor(pkg: MinimalPackage) {
  *     this.active = process.env['SOME_ENV'] !== undefined;
  *     
  *     this._minLogLevel = (process.env['SOME_ENV_MIN_LOG_LEVEL'] as LogLevel) || 'ERROR';

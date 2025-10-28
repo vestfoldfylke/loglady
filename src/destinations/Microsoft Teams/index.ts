@@ -1,6 +1,7 @@
 import type { LogDestination } from '../../types/LogDestination.types';
-import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
+import type { LogLevel, MessageObject, MessageObjectProperties, TrackedPromise } from '../../types/log.types';
 import type { MicrosoftTeamsColor } from '../../types/microsoft-teams-color';
+import type { MinimalPackage } from '../../types/minimal-package.types';
 
 import { canLogAtLevel } from '../../lib/log-level.js';
 
@@ -21,10 +22,10 @@ export default class MicrosoftTeamsDestination implements LogDestination {
 
   private readonly _minLogLevel: LogLevel;
   // @ts-ignore - This comment can be removed when _pkg is used
-  private readonly _pkg: unknown;
+  private readonly _pkg: MinimalPackage;
   private readonly _webhookUrl: string | undefined;
 
-  constructor(pkg: unknown) {
+  constructor(pkg: MinimalPackage) {
     this._minLogLevel = (process.env['TEAMS_MIN_LOG_LEVEL'] as LogLevel) || 'ERROR';
     this._pkg = pkg;
     this._webhookUrl = process.env['TEAMS_WEBHOOK_URL'];
@@ -48,12 +49,11 @@ export default class MicrosoftTeamsDestination implements LogDestination {
   }
 
   private getRepositoryString(): string | undefined {
-    if (!this._pkg || typeof this._pkg !== 'object' || !('repository' in this._pkg)) {
+    if (!this._pkg.repository) {
       return undefined;
     }
-    
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const repository = (this._pkg as any).repository;
+
+    const repository = this._pkg.repository;
 
     if (typeof repository === 'string') {
       return repository.replace('git+', '').replace('.git', '');
@@ -66,23 +66,17 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     return undefined;
   }
   
-  private getAdaptiveCardTitle(level: LogLevel): string {
-    if (!this._pkg || typeof this._pkg !== 'object' || !('name' in this._pkg) || !('version' in this._pkg)) {
-      return `${level} - loglady 🪵`;
+  private getAdaptiveCardTitle(level: LogLevel, properties: MessageObjectProperties): string {
+    const appName: string | undefined = properties['AppName'] as string ?? undefined;
+    const version: string | undefined = properties['Version'] as string ?? undefined;
+
+    if (appName && version) {
+      return `${level} - ${appName} - v${version}`;
     }
 
-    const appName = 'name' in this._pkg
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ? (this._pkg as any).name
-      : undefined;
-    const version = 'version' in this._pkg
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ? (this._pkg as any).version
-      : undefined;
-
-    return `${level} - ${appName} - v${version}`;
+    return `${level} - loglady 🪵`;
   }
-  
+
   private createAdaptiveCardMessage(title: string, color: string, repositoryString: string | undefined, messageObject: MessageObject): unknown {
     const adaptiveCard = {
       type: 'message',
@@ -226,7 +220,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
 
     const color: MicrosoftTeamsColor = this.getAdaptiveCardColor(level);
     const repositoryString: string | undefined = this.getRepositoryString();
-    const title: string | undefined = this.getAdaptiveCardTitle(level);
+    const title: string | undefined = this.getAdaptiveCardTitle(level, messageObject.properties);
 
     const adaptiveCardMessage = this.createAdaptiveCardMessage(title, color, repositoryString, messageObject);
 

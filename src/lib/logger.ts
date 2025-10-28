@@ -3,24 +3,56 @@ import BetterStackDestination from '../destinations/BetterStack/index.js';
 import MicrosoftTeamsDestination from '../destinations/Microsoft Teams/index.js';
 
 import { getPackageJson } from './get-package-json.js';
+import { getRuntimeInfo } from './get-runtime-info.js';
 
 import type { LogDestination } from '../types/LogDestination.types';
-import type { CallingInfo, LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../types/log.types';
+import type { CallingInfo, LogLevel, MessageObject, MessageObjectProperties, MessageParameter, RuntimeInfo, TrackedPromise } from '../types/log.types';
+import type { MinimalPackage } from '../types/minimal-package.types';
 
 export class Logger {
   protected _destinations: LogDestination[] = [];
   protected _queue: TrackedPromise[];
+  protected _runtimeInfo: RuntimeInfo;
 
   constructor(queue: TrackedPromise[]) {
     this._queue = queue ?? [];
 
-    const pkg: unknown = getPackageJson();
+    const pkg: MinimalPackage = getPackageJson();
+    this._runtimeInfo = getRuntimeInfo(pkg);
+
     this._destinations.push(...[
       new ConsoleDestination(pkg),
       new BetterStackDestination(pkg),
       new MicrosoftTeamsDestination(pkg)
     ]);
   }
+  
+  private createPropertiesObject = (): MessageObjectProperties => {
+    const properties: MessageObjectProperties = {};
+
+    if (this._runtimeInfo.appName !== undefined) {
+      properties['AppName'] = this._runtimeInfo.appName;
+    }
+
+    if (this._runtimeInfo.version !== undefined) {
+      properties['Version'] = this._runtimeInfo.version;
+    }
+
+    if (this._runtimeInfo.environmentName !== undefined) {
+      properties['EnvironmentName'] = this._runtimeInfo.environmentName;
+    }
+
+    const callingInfo: CallingInfo | undefined = this.getCallingInfo();
+    if (callingInfo !== undefined) {
+      properties['FunctionName'] = callingInfo.functionName;
+      properties['FileName'] = callingInfo.fileName;
+      properties['FilePath'] = callingInfo.filePath;
+      properties['LineNumber'] = callingInfo.lineNumber;
+      properties['ColumnNumber'] = callingInfo.columnNumber;
+    }
+
+    return properties;
+  };
 
   private getParameterValue = (param: string, value: MessageParameter): string => {
     if (param.startsWith('@') && (typeof value === 'object' || Array.isArray(value))) {
@@ -40,12 +72,12 @@ export class Logger {
   
   private getCallingInfo = (): CallingInfo | undefined => {
     const error = new Error();
-    const stackLines = error.stack?.split('\n').slice(4, 5) ?? [];
-    if (stackLines.length === 0) {
+    const stackSplit = error.stack?.split('\n').filter(line => !line.includes('node_modules')) ?? [];
+    if (stackSplit.length < 2) {
       return undefined;
     }
 
-    const line = stackLines[0];
+    const line = stackSplit[1];
     if (line === undefined) {
       return undefined;
     }
@@ -94,7 +126,7 @@ export class Logger {
     }
 
     let message: string = messageTemplate;
-    const properties: MessageObjectProperties = {};
+    const properties: MessageObjectProperties = this.createPropertiesObject();
 
     messageParameters.forEach((param: string, index: number): void => {
       const placeholderParam: string = param.replace(/[{}]/g, '');
@@ -118,11 +150,6 @@ export class Logger {
 
     if (exception !== undefined && exception !== null && Object.prototype.hasOwnProperty.call(exception, 'stack')) {
       messageObject.exception = (exception as Error).stack;
-    }
-
-    const callingInfo: CallingInfo | undefined = this.getCallingInfo();
-    if (callingInfo !== undefined) {
-      messageObject.properties['CallingInfo'] = callingInfo;
     }
 
     this._destinations.forEach((destination: LogDestination): void => {

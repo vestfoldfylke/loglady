@@ -52,6 +52,30 @@ loglady 🪵 is built with extensibility in mind. A new log destination can be c
 > If your `log` function calls something asynchronously, make sure that your `log` function sets the `isSettled` property on the **TrackedPromise** to `true` when the promise is settled.<br />
 > <b><u>If `isSettled` is never set to `true`, the logger's flush function will hang indefinitely!</u></b>
 
+### MessageObject
+
+The `MessageObject` is the object that is sent to each log destination. It contains the following properties:
+- `messageTemplate`: The message template
+- `message`: The formatted message (with parameters applied if any)
+- `properties`: An object containing additional properties (e.g. runtime information, parameters and calling information)
+- `exception`: An optional exception object (if passed to the errorException log function)
+
+### Runtime information
+
+loglady 🪵 automatically adds the following runtime information to each log message:
+- `AppName`: The name of the application - from environment variable **APP_NAME** or `package.json` **name** field)
+- `Version`: The version of the application - from `package.json` **version** field)
+- `EnvironmentName`: The environment used - from environment variable **NODE_ENV** or defaults to `production`
+
+### Calling information
+
+loglady 🪵 automatically adds the following calling information to each log message:
+- `FunctionName`: The name of the function that called the log function
+- `FileName`: The name of the file that called the log function
+- `FilePath`: The full path of the file that called the log function
+- `LineNumber`: The line number in the file that called the log function
+- `ColumnNumber`: The column number in the file that called the log function
+
 ## Usage
 
 ```json
@@ -62,7 +86,9 @@ loglady 🪵 is built with extensibility in mind. A new log destination can be c
   "CONSOLE_ENABLED": "true",
   "CONSOLE_MIN_LOG_LEVEL": "DEBUG",
   "TEAMS_WEBHOOK_URL": "https://your-teams-webhook-url",
-  "TEAMS_MIN_LOG_LEVEL": "ERROR"
+  "TEAMS_MIN_LOG_LEVEL": "ERROR",
+  "APP_NAME": "loglady 🪵",
+  "NODE_ENV": "production"
 }
 ```
 

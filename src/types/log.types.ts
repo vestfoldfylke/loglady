@@ -19,10 +19,13 @@ export type MessageObject = {
   message: string
   exception?: undefined | unknown
   properties: MessageObjectProperties
-  appName?: string
-  version?: string
-  environmentName?: string
 };
+
+export type RuntimeInfo = {
+  appName: string | undefined
+  version: string | undefined
+  environmentName: string | undefined
+}
 
 export type TrackedPromise = {
   name: string
