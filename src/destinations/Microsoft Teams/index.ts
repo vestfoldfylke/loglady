@@ -158,9 +158,9 @@ export default class MicrosoftTeamsDestination implements LogDestination {
                   };
                 })
               }
-              // add exception header here (if exception present)
-              // add exception here (if exception present)
-              // add links here (if any)
+              // exception header will be added here (if exception present)
+              // exception will be added here (if exception present)
+              // links will be added here (if any)
             ]
           }
         }
