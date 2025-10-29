@@ -1,6 +1,6 @@
 import type { LogDestination } from '../../types/LogDestination.types';
-import type { LogLevel, MessageObject, MessageObjectProperties, TrackedPromise } from '../../types/log.types';
-import type { MicrosoftTeamsColor } from '../../types/microsoft-teams-color';
+import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from '../../types/log.types';
+import type { MicrosoftTeamsColor, MicrosoftTeamsLink } from '../../types/destinations/microsoft-teams.types';
 import type { MinimalPackage } from '../../types/minimal-package.types';
 
 import { canLogAtLevel } from '../../lib/log-level.js';
@@ -20,6 +20,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
   readonly active: boolean;
   readonly name: string = 'Microsoft Teams';
 
+  private readonly _links: MicrosoftTeamsLink[];
   private readonly _minLogLevel: LogLevel;
   // @ts-ignore - This comment can be removed when _pkg is used
   private readonly _pkg: MinimalPackage;
@@ -31,6 +32,39 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     this._webhookUrl = process.env['TEAMS_WEBHOOK_URL'];
 
     this.active = this._webhookUrl !== undefined;
+    this._links = this.getLinks();
+  }
+  
+  private getLinks(): MicrosoftTeamsLink[] {
+    const links: MicrosoftTeamsLink[] = process.env['TEAMS_LINKS']?.split(',')
+      .map(link => {
+        const linkParts: string[] = link.split(';');
+        if (linkParts.length !== 2 || !/^https:\/\//.test(linkParts[1] as string)) {
+          return null;
+        }
+
+        return {
+          title: linkParts[0] as string,
+          url: linkParts[1] as string
+        };
+      })
+      .filter((link: MicrosoftTeamsLink | null) => link !== null)
+    ?? [];
+
+    const repositoryString: string | undefined = this.getRepositoryString();
+    if (repositoryString === undefined || !/^https:\/\//.test(repositoryString)) {
+      return links;
+    }
+
+    const url = new URL(repositoryString);
+    if (url.hostname === 'github.com') {
+      links.push({
+        title: 'Repository',
+        url: repositoryString
+      });
+    }
+
+    return links;
   }
 
   private getAdaptiveCardColor(level: LogLevel): MicrosoftTeamsColor {
@@ -77,7 +111,15 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     return `${level} - loglady 🪵`;
   }
 
-  private createAdaptiveCardMessage(title: string, color: string, repositoryString: string | undefined, messageObject: MessageObject): unknown {
+  private getFactSetValue = (value: MessageParameter): string => {
+    if (typeof value === 'object' || Array.isArray(value)) {
+      return JSON.stringify(value);
+    }
+
+    return value.toString();
+  };
+
+  private createAdaptiveCardMessage(title: string, color: string, messageObject: MessageObject): unknown {
     const adaptiveCard = {
       type: 'message',
       attachments: [
@@ -109,24 +151,22 @@ export default class MicrosoftTeamsDestination implements LogDestination {
                 type: 'FactSet',
                 spacing: 'Small',
                 separator: true,
-                facts: [] // add properties in here (if any)
+                facts: Object.entries(messageObject.properties).map(([key, value]: [string, MessageParameter]) => {
+                  return {
+                    title: `${key}:`,
+                    value: this.getFactSetValue(value)
+                  };
+                })
               }
-              // add exception header and message here (if any)
-              // add repository underneath here (if any)
+              // add exception header here (if exception present)
+              // add exception here (if exception present)
+              // add links here (if any)
             ]
           }
         }
       ]
     };
 
-    Object.entries(messageObject.properties).forEach(([key, value]) => {
-      // @ts-ignore
-      adaptiveCard.attachments[0]!.content.body[2]!.facts!.push({
-        title: `${key}:`,
-        value
-      });
-    });
-    
     if (messageObject.exception !== undefined) {
       // @ts-ignore
       adaptiveCard.attachments[0]!.content.body.push({
@@ -152,33 +192,21 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       });
     }
 
-    if (repositoryString === undefined) {
+    if (this._links.length === 0) {
       return adaptiveCard;
     }
 
-    if (/^https:\/\//.test(repositoryString)) {
-      adaptiveCard.attachments[0]!.content.body.push({
-        type: 'ActionSet',
-        separator: true,
-        // @ts-ignore
-        actions: [
-          {
-            type: 'Action.OpenUrl',
-            title: 'Repository',
-            url: repositoryString
-          }
-        ]
-      });
-
-      return adaptiveCard;
-    }
-
-    // @ts-ignore
     adaptiveCard.attachments[0]!.content.body.push({
-      type: 'TextBlock',
+      type: 'ActionSet',
       separator: true,
-      text: `Repository: ${repositoryString}`,
-      wrap: true
+      // @ts-ignore
+      actions: this._links.map((link: MicrosoftTeamsLink) => {
+        return {
+          type: 'Action.OpenUrl',
+          title: link.title,
+          url: link.url
+        };
+      })
     });
 
     return adaptiveCard;
@@ -194,10 +222,9 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     }
 
     const color: MicrosoftTeamsColor = this.getAdaptiveCardColor(level);
-    const repositoryString: string | undefined = this.getRepositoryString();
     const title: string | undefined = this.getAdaptiveCardTitle(level, messageObject.properties);
 
-    const adaptiveCardMessage = this.createAdaptiveCardMessage(title, color, repositoryString, messageObject);
+    const adaptiveCardMessage = this.createAdaptiveCardMessage(title, color, messageObject);
 
     const promise: Promise<Response> = fetch(this._webhookUrl as string, {
       method: 'POST',
