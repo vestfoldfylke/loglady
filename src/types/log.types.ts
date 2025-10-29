@@ -17,7 +17,7 @@ export type MessageObjectProperties = {
 export type MessageObject = {
   messageTemplate: string
   message: string
-  exception?: undefined | unknown
+  exception?: string | undefined
   properties: MessageObjectProperties
 };
 
