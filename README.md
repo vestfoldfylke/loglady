@@ -38,6 +38,10 @@ To use the Microsoft Teams log destination, you need to set the following enviro
 - `TEAMS_WEBHOOK_URL`: Your Microsoft Teams webhook URL
 - `TEAMS_MIN_LOG_LEVEL`: The minimum log level to send to Microsoft Teams (see log levels above)
 
+Optional environment variables:
+- `TEAMS_LINKS`: Comma separated, semicolon separated list of name and url to show as ActionButtons (open url) on the teams card.
+See example further down under [Usage](#usage) 
+
 ### Add your own log destination
 
 loglady 🪵 is built with extensibility in mind. A new log destination can be created by implementing the `LogDestination` interface.
@@ -63,8 +67,8 @@ The `MessageObject` is the object that is sent to each log destination. It conta
 ### Runtime information
 
 loglady 🪵 automatically adds the following runtime information to each log message:
-- `AppName`: The name of the application - from environment variable **APP_NAME** or `package.json` **name** field)
-- `Version`: The version of the application - from `package.json` **version** field)
+- `AppName`: The name of the application - from environment variable **APP_NAME** or `package.json` **name** field
+- `Version`: The version of the application - from `package.json` **version** field
 - `EnvironmentName`: The environment used - from environment variable **NODE_ENV** or defaults to `production`
 
 ### Calling information
@@ -87,6 +91,7 @@ loglady 🪵 automatically adds the following calling information to each log me
   "CONSOLE_MIN_LOG_LEVEL": "DEBUG",
   "TEAMS_WEBHOOK_URL": "https://your-teams-webhook-url",
   "TEAMS_MIN_LOG_LEVEL": "ERROR",
+  "TEAMS_LINKS": "LogSystem;https://somelogprovider.com/whatever,Coffee;https://letmegooglethat.com/?q=coffee",
   "APP_NAME": "loglady 🪵",
   "NODE_ENV": "production"
 }
