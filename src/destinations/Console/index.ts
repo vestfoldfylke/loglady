@@ -45,26 +45,35 @@ export default class ConsoleDestination implements LogDestination {
 
     const levelString: string = `[${level}]`;
 
+    const params = [
+      new Date().toISOString(),
+      levelString,
+      messageObject.properties['ContextId']
+        ? `[${messageObject.properties['ContextId']}]`
+        : undefined,
+      messageObject.message
+    ].filter(part => part !== undefined);
+
     switch (level) {
       case 'DEBUG':
-        console.debug(new Date().toISOString(), levelString, messageObject.message);
+        console.debug(...params);
         break;
       case 'INFO':
-        console.info(new Date().toISOString(), levelString, messageObject.message);
+        console.info(...params);
         break;
       case 'WARN':
-        console.warn(new Date().toISOString(), levelString, messageObject.message);
+        console.warn(...params);
         break;
       case 'ERROR':
         if (messageObject.exception !== undefined) {
-          console.error(new Date().toISOString(), levelString, messageObject.message, '--->', messageObject.exception);
+          console.error(...params, '--->', messageObject.exception);
           break;
         }
 
-        console.error(new Date().toISOString(), levelString, messageObject.message);
+        console.error(...params);
         break;
       default:
-        console.log(new Date().toISOString(), levelString, messageObject.message);
+        console.log(...params);
     }
 
     return {

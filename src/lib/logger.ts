@@ -5,6 +5,7 @@ import MicrosoftTeamsDestination from '../destinations/Microsoft Teams/index.js'
 import { getPackageJson } from './get-package-json.js';
 import { getRuntimeInfo } from './get-runtime-info.js';
 
+import type { LogConfig } from '../types/log-config.types';
 import type { LogDestination } from '../types/LogDestination.types';
 import type { CallingInfo, LogLevel, MessageObject, MessageObjectProperties, MessageParameter, RuntimeInfo, TrackedPromise } from '../types/log.types';
 import type { MinimalPackage } from '../types/minimal-package.types';
@@ -27,7 +28,7 @@ export class Logger {
     ]);
   }
   
-  private createPropertiesObject = (): MessageObjectProperties => {
+  private createPropertiesObject = (logConfig: LogConfig): MessageObjectProperties => {
     const properties: MessageObjectProperties = {};
 
     if (this._runtimeInfo.appName !== undefined) {
@@ -40,6 +41,10 @@ export class Logger {
 
     if (this._runtimeInfo.environmentName !== undefined) {
       properties['EnvironmentName'] = this._runtimeInfo.environmentName;
+    }
+
+    if (logConfig.contextId) {
+      properties['ContextId'] = logConfig.contextId;
     }
 
     const callingInfo: CallingInfo | undefined = this.getCallingInfo();
@@ -119,14 +124,14 @@ export class Logger {
    * 
    * Called by level logger functions to log a message to active destinations
    */
-  public log = (messageTemplate: string, level: LogLevel, exception: undefined | unknown, ...params: MessageParameter[]): void => {
+  public log = (logConfig: LogConfig, messageTemplate: string, level: LogLevel, exception: undefined | unknown, ...params: MessageParameter[]): void => {
     const messageParameters: RegExpMatchArray | [] = messageTemplate.match(/{[a-zæøåA-ZÆØÅ0-9]+}|{@[a-zæøåA-ZÆØÅ0-9]+}/g) ?? [];
     if (!Array.isArray(params) || params.length !== messageParameters.length) {
       throw new Error(`[${new Date().toISOString()}] - Not enough parameters provided for ${level} messageTemplate. Expected ${messageParameters.length}, got ${params.length}`);
     }
 
     let message: string = messageTemplate;
-    const properties: MessageObjectProperties = this.createPropertiesObject();
+    const properties: MessageObjectProperties = this.createPropertiesObject(logConfig);
 
     messageParameters.forEach((param: string, index: number): void => {
       const placeholderParam: string = param.replace(/[{}]/g, '');
@@ -141,6 +146,14 @@ export class Logger {
       message = message.replace(param, messageValue.toString());
       properties[cleanParam] = paramValue;
     });
+
+    if (logConfig.prefix) {
+      message = `${logConfig.prefix} - ${message}`;
+    }
+
+    if (logConfig.suffix) {
+      message = `${message} - ${logConfig.suffix}`;
+    }
 
     const messageObject: MessageObject = {
       messageTemplate,
