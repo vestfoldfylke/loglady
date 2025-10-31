@@ -15,8 +15,8 @@ export namespace logger {
    * Should be called before application exits or session is finished, to ensure all log messages have been processed (either successfully or with an error)
    */
   export async function flush(): Promise<void> {
-    await Promise.allSettled(_queue);
-    _queue.length = 0;
+    await Promise.allSettled(_queue.map((trackedPromise: TrackedPromise) => trackedPromise.promise));
+    _queue.splice(0, _queue.length, ..._queue.filter((trackedPromise: TrackedPromise) => !trackedPromise.isSettled));
   }
 
   /**
