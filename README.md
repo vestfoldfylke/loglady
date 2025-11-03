@@ -100,6 +100,13 @@ loglady 🪵 automatically adds the following calling information to each log me
 ```typescript
 import { logger } from '@vestfoldfylke/loglady';
 
+// optionl settings to set before using the logger
+logger.logConfig({
+  contextId: 'some-unique-id-for-this-run', // set a context id to correlate log messages for a specific run (will be added as a property to each log message)
+  prefix: 'something-to-show-before-every-message', // will be prepended to the beginning of each log message
+  suffix: 'something-to-show-after-every-message', // will be appended to the end of each log message
+});
+
 // log at different levels. All log functions support message templates and parameters
 logger.debug('This is a debug message');
 logger.info('This is an info message for UserName {UserName}', 'john.doe');
