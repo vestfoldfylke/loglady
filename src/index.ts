@@ -1,10 +1,13 @@
 import { Logger } from './lib/logger.js';
 
+import type { LogConfig } from './types/log-config.types';
 import type { MessageParameter, TrackedPromise } from './types/log.types';
 
 const _queue: TrackedPromise[] = [];
 
 const _logger = new Logger(_queue);
+
+let _logConfig: LogConfig = {};
 
 export namespace logger {
   // noinspection JSUnusedGlobalSymbols
@@ -12,8 +15,30 @@ export namespace logger {
    * Should be called before application exits or session is finished, to ensure all log messages have been processed (either successfully or with an error)
    */
   export async function flush(): Promise<void> {
-    await Promise.allSettled(_queue);
-    _queue.length = 0;
+    await Promise.allSettled(_queue.map((trackedPromise: TrackedPromise) => trackedPromise.promise));
+    _queue.splice(0, _queue.length, ..._queue.filter((trackedPromise: TrackedPromise) => !trackedPromise.isSettled));
+  }
+
+  /**
+   * Configure optional logging settings<br />
+   * Can be called multiple times to update specific settings<br /><br />
+   *
+   * Example:<br />
+   * ```typescript
+   * logConfig({
+   *   contextId: '12345-abcde-67890-fghij',
+   *   prefix: 'Will be prepended to the beginning of each log message',
+   *   suffix: 'Will be appended to the end of each log message',
+   * });
+   * ```
+   *
+   * @param logConfig - Log configuration settings
+   */
+  export function logConfig(logConfig: LogConfig): void {
+    _logConfig = {
+      ..._logConfig,
+      ...logConfig
+    };
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -37,7 +62,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function debug(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(messageTemplate, 'DEBUG', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, 'DEBUG', undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -61,7 +86,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function info(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(messageTemplate, 'INFO', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, 'INFO', undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -85,7 +110,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function warn(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(messageTemplate, 'WARN', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, 'WARN', undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -109,7 +134,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function error(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(messageTemplate, 'ERROR', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, 'ERROR', undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -138,6 +163,6 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function errorException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(messageTemplate, 'ERROR', exception, ...params);
+    _logger.log(_logConfig, messageTemplate, 'ERROR', exception, ...params);
   }
 }

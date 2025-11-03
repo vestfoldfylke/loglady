@@ -2,11 +2,13 @@ import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
 
 /**
  * Interface for a log destination<br /><br />
- * 
- * Implement this interface to create a custom log destination for the loglady 🪵<br /><br />
- * 
+ *
+ * Implement this interface to create a custom log destination for loglady 🪵<br /><br />
+ *
  * The callers package.json file will be imported and passed to the constructor of the implementing class<br /><br />
- * 
+ *
+ * If the destination adds any custom environment variables to control its behavior, <b><u>document them in the README.md file!</u></b><br /><br />
+ *
  * Example implementation:
  * ```typescript
  * import type { LogDestination } from '../../types/LogDestination.types';
@@ -18,18 +20,19 @@ import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
  * export default class CustomDestination implements LogDestination {
  *   readonly active: boolean;
  *   readonly name: string = '%DestinationNameHere%';
- *   
+ *
  *   private readonly _minLogLevel: LogLevel;
  *   // @ts-ignore - This comment can be removed when _pkg is used
  *   private readonly _pkg: MinimalPackage;
- * 
+ *
  *   constructor(pkg: MinimalPackage) {
+ *     // set your own logic to determine if the destination is active based on environment variables or other criteria
  *     this.active = process.env['SOME_ENV'] !== undefined;
- *     
+ *
  *     this._minLogLevel = (process.env['SOME_ENV_MIN_LOG_LEVEL'] as LogLevel) || 'ERROR';
  *     this._pkg = pkg;
  *   }
- * 
+ *
  *   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
  *     if (!canLogAtLevel(level, this._minLogLevel)) {
  *       return {
@@ -53,11 +56,11 @@ import type { LogLevel, MessageObject, TrackedPromise } from './log.types';
 export interface LogDestination {
   /**
    * Indicates whether the destination is active and should receive log messages. Can be overridden by environment variables (check README)<br /><br />
-   * 
+   *
    * Should be set in the constructor of the implementing class based on environment variables
    * ```typescript
    * constructor() {
-   *   // determine active status based on environment variable(s)
+   *   // set your own logic to determine if the destination is active based on environment variables or other criteria
    *   this.active = process.env['SOME_ENV_VAR'] !== undefined;
    * }
    * ```
