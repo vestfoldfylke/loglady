@@ -140,7 +140,7 @@ export class Logger {
     messageParameters.forEach((param: string, index: number): void => {
       const placeholderParam: string = param.replace(/[{}]/g, '');
       const cleanParam: string = placeholderParam.replace(/@/g, '');
-      const paramValue: MessageParameter = params[index];
+      const paramValue: MessageParameter = params[index] ?? null;
 
       const messageValue: string = this.getParameterValue(placeholderParam, paramValue);
 
