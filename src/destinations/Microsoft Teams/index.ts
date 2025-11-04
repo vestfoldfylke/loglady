@@ -112,6 +112,10 @@ export default class MicrosoftTeamsDestination implements LogDestination {
   }
 
   private getFactSetValue = (value: MessageParameter): string => {
+    if (value === undefined || value === null) {
+      return 'NULL';
+    }
+
     if (typeof value === 'object' || Array.isArray(value)) {
       return JSON.stringify(value);
     }
