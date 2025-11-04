@@ -1,15 +1,15 @@
-import type { LogDestination } from '../../types/LogDestination.types';
-import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
-import type { MinimalPackage } from '../../types/minimal-package.types';
+import { canLogAtLevel } from "../../lib/log-level.js";
 
-import { canLogAtLevel } from '../../lib/log-level.js';
+import type { LogDestination } from "../../types/LogDestination.types";
+import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
+import type { MinimalPackage } from "../../types/minimal-package.types";
 
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
- * 
+ *
  * LogDestination that logs to BetterStack<br /><br />
- * 
+ *
  * **active**: `true` only when **BETTERSTACK_URL** and **BETTERSTACK_TOKEN** are specified as environment variables<br />
  * **name**: 'BetterStack'<br /><br >
  *
@@ -17,20 +17,20 @@ import { canLogAtLevel } from '../../lib/log-level.js';
  */
 export default class BetterStackDestination implements LogDestination {
   readonly active: boolean;
-  readonly name: string = 'BetterStack';
+  readonly name: string = "BetterStack";
 
   private readonly _endpoint: string | undefined;
   private readonly _token: string | undefined;
 
   private readonly _minLogLevel: LogLevel;
-  // @ts-ignore - This comment can be removed when _pkg is used
+  // @ts-expect-error - This comment can be removed when _pkg is used
   private readonly _pkg: MinimalPackage;
 
   constructor(pkg: MinimalPackage) {
-    this._endpoint = process.env['BETTERSTACK_URL'];
-    this._token = process.env['BETTERSTACK_TOKEN'];
+    this._endpoint = process.env["BETTERSTACK_URL"];
+    this._token = process.env["BETTERSTACK_TOKEN"];
 
-    this._minLogLevel = (process.env['BETTERSTACK_MIN_LOG_LEVEL'] as LogLevel) || 'INFO';
+    this._minLogLevel = (process.env["BETTERSTACK_MIN_LOG_LEVEL"] as LogLevel) || "INFO";
     this._pkg = pkg;
 
     this.active = this._endpoint !== undefined && this._token !== undefined;
@@ -56,11 +56,11 @@ export default class BetterStackDestination implements LogDestination {
     const betterStackMessage: unknown = this.createMessage(messageObject, level);
 
     const promise: Promise<Response> = fetch(this._endpoint as string, {
-      method: 'POST',
+      method: "POST",
       signal: AbortSignal.timeout(5000),
       headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${this._token}`,
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this._token}`
       },
       body: JSON.stringify(betterStackMessage)
     });

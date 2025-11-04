@@ -1,7 +1,7 @@
-import { Logger } from './lib/logger.js';
+import { Logger } from "./lib/logger.js";
 
-import type { LogConfig } from './types/log-config.types';
-import type { MessageParameter, TrackedPromise } from './types/log.types';
+import type { MessageParameter, TrackedPromise } from "./types/log.types";
+import type { LogConfig } from "./types/log-config.types";
 
 const _queue: TrackedPromise[] = [];
 
@@ -62,7 +62,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function debug(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, 'DEBUG', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, "DEBUG", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -86,7 +86,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function info(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, 'INFO', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, "INFO", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -110,7 +110,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function warn(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, 'WARN', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, "WARN", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -134,7 +134,7 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function error(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, 'ERROR', undefined, ...params);
+    _logger.log(_logConfig, messageTemplate, "ERROR", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -163,6 +163,6 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function errorException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, 'ERROR', exception, ...params);
+    _logger.log(_logConfig, messageTemplate, "ERROR", exception, ...params);
   }
 }

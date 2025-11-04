@@ -1,14 +1,23 @@
-import ConsoleDestination from '../destinations/Console/index.js';
-import BetterStackDestination from '../destinations/BetterStack/index.js';
-import MicrosoftTeamsDestination from '../destinations/Microsoft Teams/index.js';
+import BetterStackDestination from "../destinations/BetterStack/index.js";
+import ConsoleDestination from "../destinations/Console/index.js";
+import MicrosoftTeamsDestination from "../destinations/Microsoft Teams/index.js";
 
-import { getPackageJson } from './get-package-json.js';
-import { getRuntimeInfo } from './get-runtime-info.js';
+import type { LogDestination } from "../types/LogDestination.types";
+import type {
+  CallingInfo,
+  LogLevel,
+  MessageObject,
+  MessageObjectProperties,
+  MessageParameter,
+  RuntimeInfo,
+  TrackedPromise
+} from "../types/log.types";
 
-import type { LogConfig } from '../types/log-config.types';
-import type { LogDestination } from '../types/LogDestination.types';
-import type { CallingInfo, LogLevel, MessageObject, MessageObjectProperties, MessageParameter, RuntimeInfo, TrackedPromise } from '../types/log.types';
-import type { MinimalPackage } from '../types/minimal-package.types';
+import type { LogConfig } from "../types/log-config.types";
+import type { MinimalPackage } from "../types/minimal-package.types";
+
+import { getPackageJson } from "./get-package-json.js";
+import { getRuntimeInfo } from "./get-runtime-info.js";
 
 export class Logger {
   protected _destinations: LogDestination[] = [];
@@ -21,39 +30,35 @@ export class Logger {
     const pkg: MinimalPackage = getPackageJson();
     this._runtimeInfo = getRuntimeInfo(pkg);
 
-    this._destinations.push(...[
-      new ConsoleDestination(pkg),
-      new BetterStackDestination(pkg),
-      new MicrosoftTeamsDestination(pkg)
-    ]);
+    this._destinations.push(...[new ConsoleDestination(pkg), new BetterStackDestination(pkg), new MicrosoftTeamsDestination(pkg)]);
   }
-  
+
   private createPropertiesObject = (logConfig: LogConfig): MessageObjectProperties => {
     const properties: MessageObjectProperties = {};
 
     if (this._runtimeInfo.appName !== undefined) {
-      properties['AppName'] = this._runtimeInfo.appName;
+      properties["AppName"] = this._runtimeInfo.appName;
     }
 
     if (this._runtimeInfo.version !== undefined) {
-      properties['Version'] = this._runtimeInfo.version;
+      properties["Version"] = this._runtimeInfo.version;
     }
 
     if (this._runtimeInfo.environmentName !== undefined) {
-      properties['EnvironmentName'] = this._runtimeInfo.environmentName;
+      properties["EnvironmentName"] = this._runtimeInfo.environmentName;
     }
 
     if (logConfig.contextId) {
-      properties['ContextId'] = logConfig.contextId;
+      properties["ContextId"] = logConfig.contextId;
     }
 
     const callingInfo: CallingInfo | undefined = this.getCallingInfo();
     if (callingInfo !== undefined) {
-      properties['FunctionName'] = callingInfo.functionName;
-      properties['FileName'] = callingInfo.fileName;
-      properties['FilePath'] = callingInfo.filePath;
-      properties['LineNumber'] = callingInfo.lineNumber;
-      properties['ColumnNumber'] = callingInfo.columnNumber;
+      properties["FunctionName"] = callingInfo.functionName;
+      properties["FileName"] = callingInfo.fileName;
+      properties["FilePath"] = callingInfo.filePath;
+      properties["LineNumber"] = callingInfo.lineNumber;
+      properties["ColumnNumber"] = callingInfo.columnNumber;
     }
 
     return properties;
@@ -61,16 +66,16 @@ export class Logger {
 
   private getParameterValue = (param: string, value: MessageParameter): string => {
     if (value === undefined || value === null) {
-      return 'NULL';
+      return "NULL";
     }
 
-    if (param.startsWith('@') && (typeof value === 'object' || Array.isArray(value))) {
+    if (param.startsWith("@") && (typeof value === "object" || Array.isArray(value))) {
       return JSON.stringify(value);
     }
 
     return value.toString();
   };
-  
+
   private cleanupQueue = (): void => {
     for (let i: number = this._queue.length - 1; i >= 0; i--) {
       if (this._queue[i]?.isSettled) {
@@ -78,10 +83,10 @@ export class Logger {
       }
     }
   };
-  
+
   private getCallingInfo = (): CallingInfo | undefined => {
     const error = new Error();
-    const stackSplit = error.stack?.split('\n').filter(line => !line.includes('node_modules')) ?? [];
+    const stackSplit = error.stack?.split("\n").filter((line) => !line.includes("node_modules")) ?? [];
     if (stackSplit.length < 2) {
       return undefined;
     }
@@ -96,23 +101,19 @@ export class Logger {
       return undefined;
     }
 
-    const functionName: string = match.length >= 5
-      ? match[1] as string
-      : '<anonymous>';
+    const functionName: string = match.length >= 5 ? (match[1] as string) : "<anonymous>";
 
-    const filePath: string = match.length >= 5
-      ? match[2] as string
-      : match[1] as string;
+    const filePath: string = match.length >= 5 ? (match[2] as string) : (match[1] as string);
 
-    const fileName: string = filePath?.replace(process.cwd(), '').replace(/(^\/+)|(^\\+)/, '').replace('file:///', '') ?? undefined;
+    const fileName: string =
+      filePath
+        ?.replace(process.cwd(), "")
+        .replace(/(^\/+)|(^\\+)/, "")
+        .replace("file:///", "") ?? undefined;
 
-    const lineNumber = match.length >= 5
-      ? parseInt(match[3] as string, 10)
-      : parseInt(match[2] as string, 10);
+    const lineNumber = match.length >= 5 ? parseInt(match[3] as string, 10) : parseInt(match[2] as string, 10);
 
-    const columnNumber = match.length >= 5
-      ? parseInt(match[4] as string, 10)
-      : parseInt(match[3] as string, 10);
+    const columnNumber = match.length >= 5 ? parseInt(match[4] as string, 10) : parseInt(match[3] as string, 10);
 
     return {
       functionName,
@@ -125,13 +126,21 @@ export class Logger {
 
   /**
    * @internal
-   * 
+   *
    * Called by level logger functions to log a message to active destinations
    */
-  public log = (logConfig: LogConfig, messageTemplate: string, level: LogLevel, exception: undefined | unknown, ...params: MessageParameter[]): void => {
+  public log = (
+    logConfig: LogConfig,
+    messageTemplate: string,
+    level: LogLevel,
+    exception: undefined | unknown,
+    ...params: MessageParameter[]
+  ): void => {
     const messageParameters: RegExpMatchArray | [] = messageTemplate.match(/{[a-zæøåA-ZÆØÅ0-9]+}|{@[a-zæøåA-ZÆØÅ0-9]+}/g) ?? [];
     if (!Array.isArray(params) || params.length !== messageParameters.length) {
-      throw new Error(`[${new Date().toISOString()}] - Not enough parameters provided for ${level} messageTemplate. Expected ${messageParameters.length}, got ${params.length}`);
+      throw new Error(
+        `[${new Date().toISOString()}] - Not enough parameters provided for ${level} messageTemplate. Expected ${messageParameters.length}, got ${params.length}`
+      );
     }
 
     let message: string = messageTemplate;
@@ -162,7 +171,7 @@ export class Logger {
       properties
     };
 
-    if (exception !== undefined && exception !== null && Object.prototype.hasOwnProperty.call(exception, 'stack')) {
+    if (exception !== undefined && exception !== null && Object.hasOwn(exception, "stack")) {
       messageObject.exception = (exception as Error).stack;
     }
 
