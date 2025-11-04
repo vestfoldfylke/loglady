@@ -8,7 +8,7 @@ export type CallingInfo = {
 
 export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR';
 
-export type MessageParameter = string | number | bigint | boolean | object | [];
+export type MessageParameter = string | number | bigint | boolean | object | [] | undefined | null;
 
 export type MessageObjectProperties = {
   [key: string]: MessageParameter

@@ -60,6 +60,10 @@ export class Logger {
   };
 
   private getParameterValue = (param: string, value: MessageParameter): string => {
+    if (value === undefined || value === null) {
+      return 'NULL';
+    }
+
     if (param.startsWith('@') && (typeof value === 'object' || Array.isArray(value))) {
       return JSON.stringify(value);
     }
@@ -136,10 +140,7 @@ export class Logger {
     messageParameters.forEach((param: string, index: number): void => {
       const placeholderParam: string = param.replace(/[{}]/g, '');
       const cleanParam: string = placeholderParam.replace(/@/g, '');
-      const paramValue: MessageParameter | undefined = params[index];
-      if (paramValue === undefined) {
-        throw new Error(`[${new Date().toISOString()}] - Parameter at index ${index} is undefined for ${level} messageTemplate`);
-      }
+      const paramValue: MessageParameter = params[index];
 
       const messageValue: string = this.getParameterValue(placeholderParam, paramValue);
 

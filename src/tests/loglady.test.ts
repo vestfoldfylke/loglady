@@ -12,37 +12,91 @@ const logFunctions = {
 
 const mockStdoutAndCallLogger = (callLoggerFunc: Function): string => {
   let output: string = '';
-  const originalWrite = process.stdout.write;
+  const originalStdoutWrite = process.stdout.write;
+  const originalStderrWrite = process.stderr.write;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   process.stdout.write = (chunk: any, ...args: any[]): boolean => {
     output += chunk;
-    return originalWrite.call(process.stdout, chunk, ...args);
+    return originalStdoutWrite.call(process.stdout, chunk, ...args);
   };
-  
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  process.stderr.write = (chunk: any, ...args: any[]): boolean => {
+    output += chunk;
+    return originalStderrWrite.call(process.stderr, chunk, ...args);
+  };
+
   callLoggerFunc();
 
-  process.stdout.write = originalWrite;
-  
+  process.stdout.write = originalStdoutWrite;
+  process.stderr.write = originalStderrWrite;
+
   return output;
 };
 
 describe('loglady 🪵  should not throw errors during logging', () => {
   Object.entries(logFunctions).forEach(([level, logFunction]) => {
     it(`when "${level}" is called with messageTemplate only`, () => {
-      assert.doesNotThrow(() => logFunction.call(logger, `This is ${level} message`));
+      assert.doesNotThrow(() => {
+        const output = mockStdoutAndCallLogger(() => logFunction.call(logger, `This is ${level} message`));
+        assert.ok(!output.includes(': NULL'));
+      });
     });
 
     it(`when "${level}" is called with messageTemplate and 1 parameter`, () => {
-      assert.doesNotThrow(() => logFunction.call(logger, `This is ${level} message: {Message}`, 'loglady test'));
+      assert.doesNotThrow(() => {
+        const output = mockStdoutAndCallLogger(() => logFunction.call(logger, `This is ${level} message: {Message}`, 'loglady test'));
+        assert.ok(output.includes(': loglady test'));
+        assert.ok(!output.includes(': NULL'));
+      });
+    });
+
+    it(`when "${level}" is called with messageTemplate and 1 parameter which is undefined`, () => {
+      assert.doesNotThrow(() => {
+        const output = mockStdoutAndCallLogger(() => logFunction.call(logger, `This is ${level} message: {Message}`, undefined));
+        assert.ok(output.includes(': NULL'));
+        assert.ok(!output.includes('undefined'));
+      });
+    });
+
+    it(`when "${level}" is called with messageTemplate and 1 parameter which is null`, () => {
+      assert.doesNotThrow(() => {
+        const output = mockStdoutAndCallLogger(() => logger.error(`This is ${level} message: {Message}`, null));
+        assert.ok(output.includes(': NULL'));
+        assert.ok(!output.includes('undefined'));
+      });
     });
   });
 
   it('when "error" is called with exception and messageTemplate only', () => {
-    assert.doesNotThrow(() => logger.errorException(new Error('Test'), 'This is an error message'));
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.errorException(new Error('Test'), 'This is an error message'));
+      assert.ok(!output.includes(': NULL'));
+    });
   });
 
   it('when "error" is called with exception, messageTemplate and 1 parameter', () => {
-    assert.doesNotThrow(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}', 'loglady test'));
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}', 'loglady test'));
+      assert.ok(output.includes(': loglady test'));
+      assert.ok(!output.includes(': NULL'));
+    });
+  });
+
+  it('when "error" is called with exception, messageTemplate and 1 parameter which is undefined', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}', undefined));
+      assert.ok(output.includes(': NULL'));
+      assert.ok(!output.includes('undefined'));
+    });
+  });
+
+  it('when "error" is called with exception, messageTemplate and 1 parameter which is null', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.errorException(new Error('Test'), 'This is an error message: {Message}', null));
+      assert.ok(output.includes(': NULL'));
+      assert.ok(!output.includes('undefined'));
+    });
   });
 });
 
@@ -72,7 +126,7 @@ describe('loglady 🪵  logConfig should be callable multiple times', () => {
     const prefixStr = 'PREFIX';
     const suffixStr = 'SUFFIX';
 
-    const initialOutput = mockStdoutAndCallLogger(() => logger.info('Initial log message'));
+    const initialOutput = mockStdoutAndCallLogger(() => logger.debug('Initial log message'));
     assert.ok(!initialOutput.includes(contextIdStr));
     assert.ok(!initialOutput.includes(prefixStr));
     assert.ok(!initialOutput.includes(suffixStr));
@@ -90,7 +144,7 @@ describe('loglady 🪵  logConfig should be callable multiple times', () => {
       prefix: prefixStr
     });
 
-    const afterPrefixOutput = mockStdoutAndCallLogger(() => logger.info('Log message after setting prefix'));
+    const afterPrefixOutput = mockStdoutAndCallLogger(() => logger.warn('Log message after setting prefix'));
     assert.ok(afterPrefixOutput.includes(contextIdStr));
     assert.ok(afterPrefixOutput.includes(prefixStr));
     assert.ok(!afterPrefixOutput.includes(suffixStr));
@@ -99,7 +153,7 @@ describe('loglady 🪵  logConfig should be callable multiple times', () => {
       suffix: suffixStr
     });
 
-    const afterSuffixOutput = mockStdoutAndCallLogger(() => logger.info('Log message after setting suffix'));
+    const afterSuffixOutput = mockStdoutAndCallLogger(() => logger.error('Log message after setting suffix'));
     assert.ok(afterSuffixOutput.includes(contextIdStr));
     assert.ok(afterSuffixOutput.includes(prefixStr));
     assert.ok(afterSuffixOutput.includes(suffixStr));
@@ -108,7 +162,7 @@ describe('loglady 🪵  logConfig should be callable multiple times', () => {
       contextId: undefined
     });
 
-    const afterContextResetOutput = mockStdoutAndCallLogger(() => logger.info('Log message after resetting contextId'));
+    const afterContextResetOutput = mockStdoutAndCallLogger(() => logger.errorException(new Error('Test'), 'Log message after resetting contextId'));
     assert.ok(!afterContextResetOutput.includes(contextIdStr));
     assert.ok(afterContextResetOutput.includes(prefixStr));
     assert.ok(afterContextResetOutput.includes(suffixStr));
@@ -117,7 +171,7 @@ describe('loglady 🪵  logConfig should be callable multiple times', () => {
       prefix: undefined
     });
 
-    const afterSuffixResetOutput = mockStdoutAndCallLogger(() => logger.info('Log message after resetting prefix'));
+    const afterSuffixResetOutput = mockStdoutAndCallLogger(() => logger.debug('Log message after resetting prefix'));
     assert.ok(!afterSuffixResetOutput.includes(contextIdStr));
     assert.ok(!afterSuffixResetOutput.includes(prefixStr));
     assert.ok(afterSuffixResetOutput.includes(suffixStr));
