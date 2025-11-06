@@ -3,10 +3,7 @@
   "version": "1.1.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "package.json"
-  ],
+  "files": ["dist", "package.json"],
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -26,11 +23,7 @@
     "url": "https://github.com/vestfoldfylke/loglady/issues"
   },
   "homepage": "https://github.com/vestfoldfylke/loglady/#readme",
-  "keywords": [
-    "log",
-    "logging",
-    "structured-logging"
-  ],
+  "keywords": ["log", "logging", "structured-logging"],
   "author": {
     "name": "Rune Moskvil Lyngås",
     "email": "rune.moskvil.lyngas@vestfoldfylke.no",
