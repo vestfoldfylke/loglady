@@ -1,4 +1,4 @@
-import type { LogLevel } from '../types/log.types';
+import type { LogLevel } from "../types/log.types";
 
 const levelMapper = {
   DEBUG: 0,

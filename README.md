@@ -1,3 +1,6 @@
+![ts](https://badgen.net/badge/Built%20With/TypeScript/blue)
+[![Formatted with Biome](https://img.shields.io/badge/Formatted_and_Linted_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev/)
+
 # loglady 🪵
 
 loglady 🪵 is an opinionated, 0 dependency, TypeScript logger developed for and by [vestfoldfylke](https://github.com/vestfoldfylke)

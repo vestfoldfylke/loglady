@@ -1,15 +1,15 @@
-import type { LogDestination } from '../../types/LogDestination.types';
-import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
-import type { MinimalPackage } from '../../types/minimal-package.types';
+import { canLogAtLevel } from "../../lib/log-level.js";
 
-import { canLogAtLevel } from '../../lib/log-level.js';
+import type { LogDestination } from "../../types/LogDestination.types";
+import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
+import type { MinimalPackage } from "../../types/minimal-package.types";
 
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
- * 
+ *
  * LogDestination that logs to the console<br /><br />
- * 
+ *
  * **active**: Defaults to true, can be overridden by setting environment variable **CONSOLE_ENABLED** to `false`<br />
  * **name**: 'Console'<br /><br >
  *
@@ -17,21 +17,19 @@ import { canLogAtLevel } from '../../lib/log-level.js';
  */
 export default class ConsoleDestination implements LogDestination {
   readonly active: boolean;
-  readonly name: string = 'Console';
+  readonly name: string = "Console";
 
   private readonly _minLogLevel: LogLevel;
-  // @ts-ignore - This comment can be removed when _pkg is used
+  // @ts-expect-error - This comment can be removed when _pkg is used
   private readonly _pkg: MinimalPackage;
 
   constructor(pkg: MinimalPackage) {
-    const active: string | boolean | undefined = process.env['CONSOLE_ENABLED'];
+    const active: string | boolean | undefined = process.env["CONSOLE_ENABLED"];
 
-    this._minLogLevel = (process.env['CONSOLE_MIN_LOG_LEVEL'] as LogLevel) || 'DEBUG';
+    this._minLogLevel = (process.env["CONSOLE_MIN_LOG_LEVEL"] as LogLevel) || "DEBUG";
     this._pkg = pkg;
 
-    this.active = active === undefined
-      ? true
-      : String(active).trim().toLowerCase() === 'true';
+    this.active = active === undefined ? true : String(active).trim().toLowerCase() === "true";
   }
 
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
@@ -48,25 +46,23 @@ export default class ConsoleDestination implements LogDestination {
     const params = [
       new Date().toISOString(),
       levelString,
-      messageObject.properties['ContextId']
-        ? `[${messageObject.properties['ContextId']}]`
-        : undefined,
+      messageObject.properties["ContextId"] ? `[${messageObject.properties["ContextId"]}]` : undefined,
       messageObject.message
-    ].filter(part => part !== undefined);
+    ].filter((part) => part !== undefined);
 
     switch (level) {
-      case 'DEBUG':
+      case "DEBUG":
         console.debug(...params);
         break;
-      case 'INFO':
+      case "INFO":
         console.info(...params);
         break;
-      case 'WARN':
+      case "WARN":
         console.warn(...params);
         break;
-      case 'ERROR':
+      case "ERROR":
         if (messageObject.exception !== undefined) {
-          console.error(...params, '--->', messageObject.exception);
+          console.error(...params, "--->", messageObject.exception);
           break;
         }
 
