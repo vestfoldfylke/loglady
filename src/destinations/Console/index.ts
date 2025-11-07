@@ -1,5 +1,6 @@
 import { canLogAtLevel } from "../../lib/log-level.js";
 
+import type { ConsolePayload } from "../../types/destinations/console.types";
 import type { LogDestination } from "../../types/LogDestination.types";
 import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
 import type { MinimalPackage } from "../../types/minimal-package.types";
@@ -32,6 +33,15 @@ export default class ConsoleDestination implements LogDestination {
     this.active = active === undefined ? true : String(active).trim().toLowerCase() === "true";
   }
 
+  createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
+    return [
+      new Date().toISOString(),
+      `[${level}]`,
+      messageObject.properties["ContextId"] ? `[${messageObject.properties["ContextId"]}]` : undefined,
+      messageObject.message
+    ].filter((part) => part !== undefined) as T;
+  }
+
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
     if (!canLogAtLevel(level, this._minLogLevel)) {
       return {
@@ -41,35 +51,28 @@ export default class ConsoleDestination implements LogDestination {
       };
     }
 
-    const levelString: string = `[${level}]`;
-
-    const params = [
-      new Date().toISOString(),
-      levelString,
-      messageObject.properties["ContextId"] ? `[${messageObject.properties["ContextId"]}]` : undefined,
-      messageObject.message
-    ].filter((part) => part !== undefined);
+    const payload: ConsolePayload = this.createPayload<ConsolePayload>(messageObject, level);
 
     switch (level) {
       case "DEBUG":
-        console.debug(...params);
+        console.debug(...payload);
         break;
       case "INFO":
-        console.info(...params);
+        console.info(...payload);
         break;
       case "WARN":
-        console.warn(...params);
+        console.warn(...payload);
         break;
       case "ERROR":
         if (messageObject.exception !== undefined) {
-          console.error(...params, "--->", messageObject.exception);
+          console.error(...payload, "--->", messageObject.exception);
           break;
         }
 
-        console.error(...params);
+        console.error(...payload);
         break;
       default:
-        console.log(...params);
+        console.log(...payload);
     }
 
     return {

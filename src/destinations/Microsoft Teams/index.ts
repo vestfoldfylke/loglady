@@ -1,6 +1,11 @@
 import { canLogAtLevel } from "../../lib/log-level.js";
 
-import type { MicrosoftTeamsColor, MicrosoftTeamsLink } from "../../types/destinations/microsoft-teams.types";
+import type {
+  MicrosoftTeamsColor,
+  MicrosoftTeamsFact,
+  MicrosoftTeamsLink,
+  MicrosoftTeamsPayload
+} from "../../types/destinations/microsoft-teams.types";
 import type { LogDestination } from "../../types/LogDestination.types";
 import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from "../../types/log.types";
 import type { MinimalPackage } from "../../types/minimal-package.types";
@@ -123,8 +128,8 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     return value.toString();
   };
 
-  private createAdaptiveCardMessage(title: string, color: string, messageObject: MessageObject): unknown {
-    const adaptiveCard = {
+  private createAdaptiveCardMessage(title: string, color: string, messageObject: MessageObject): MicrosoftTeamsPayload {
+    const adaptiveCard: MicrosoftTeamsPayload = {
       type: "message",
       attachments: [
         {
@@ -155,7 +160,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
                 type: "FactSet",
                 spacing: "Small",
                 separator: true,
-                facts: Object.entries(messageObject.properties).map(([key, value]: [string, MessageParameter]) => {
+                facts: Object.entries(messageObject.properties).map(([key, value]: [string, MessageParameter]): MicrosoftTeamsFact => {
                   return {
                     title: `${key}:`,
                     value: this.getFactSetValue(value)
@@ -172,7 +177,6 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     };
 
     if (messageObject.exception !== undefined) {
-      // @ts-expect-error
       adaptiveCard.attachments[0]?.content.body.push({
         type: "TextBlock",
         text: "Exception",
@@ -185,7 +189,6 @@ export default class MicrosoftTeamsDestination implements LogDestination {
         color: "Default"
       });
 
-      // @ts-expect-error
       adaptiveCard.attachments[0]?.content.body.push({
         type: "TextBlock",
         text: messageObject.exception,
@@ -203,7 +206,6 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     adaptiveCard.attachments[0]?.content.body.push({
       type: "ActionSet",
       separator: true,
-      // @ts-expect-error
       actions: this._links.map((link: MicrosoftTeamsLink) => {
         return {
           type: "Action.OpenUrl",
@@ -216,6 +218,13 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     return adaptiveCard;
   }
 
+  createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
+    const color: MicrosoftTeamsColor = this.getAdaptiveCardColor(level);
+    const title: string | undefined = this.getAdaptiveCardTitle(level, messageObject.properties);
+
+    return this.createAdaptiveCardMessage(title, color, messageObject) as T;
+  }
+
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
     if (!canLogAtLevel(level, this._minLogLevel)) {
       return {
@@ -225,10 +234,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       };
     }
 
-    const color: MicrosoftTeamsColor = this.getAdaptiveCardColor(level);
-    const title: string | undefined = this.getAdaptiveCardTitle(level, messageObject.properties);
-
-    const adaptiveCardMessage = this.createAdaptiveCardMessage(title, color, messageObject);
+    const payload: MicrosoftTeamsPayload = this.createPayload<MicrosoftTeamsPayload>(messageObject, level);
 
     const promise: Promise<Response> = fetch(this._webhookUrl as string, {
       method: "POST",
@@ -236,7 +242,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(adaptiveCardMessage)
+      body: JSON.stringify(payload)
     });
 
     const trackedPromise: TrackedPromise = {

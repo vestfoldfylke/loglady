@@ -1,5 +1,6 @@
 import { canLogAtLevel } from "../../lib/log-level.js";
 
+import type { BetterStackPayload } from "../../types/destinations/betterstack.types";
 import type { LogDestination } from "../../types/LogDestination.types";
 import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
 import type { MinimalPackage } from "../../types/minimal-package.types";
@@ -36,13 +37,13 @@ export default class BetterStackDestination implements LogDestination {
     this.active = this._endpoint !== undefined && this._token !== undefined;
   }
 
-  private createMessage = (messageObject: MessageObject, level: LogLevel): unknown => {
+  createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
     return {
       dt: new Date().toISOString(),
       level,
       ...messageObject
-    };
-  };
+    } as T;
+  }
 
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
     if (!canLogAtLevel(level, this._minLogLevel)) {
@@ -53,7 +54,7 @@ export default class BetterStackDestination implements LogDestination {
       };
     }
 
-    const betterStackMessage: unknown = this.createMessage(messageObject, level);
+    const betterStackMessage: BetterStackPayload = this.createPayload<BetterStackPayload>(messageObject, level);
 
     const promise: Promise<Response> = fetch(this._endpoint as string, {
       method: "POST",
