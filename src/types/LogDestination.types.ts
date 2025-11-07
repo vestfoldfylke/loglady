@@ -73,6 +73,32 @@ export interface LogDestination {
   readonly name: string;
 
   /**
+   * Creates the log destination payload of type T from given messageObject and log level<br /><br />
+   *
+   * This method must be implemented in the log destination to be able to test the payload creation separately from the logging logic.<br /><br />
+   *
+   * Example usage:
+   * ```typescript
+   * createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
+   *   return {
+   *     timestamp: new Date().toISOString(),
+   *     level,
+   *     ...messageObject
+   *   } as T;
+   * }
+   *
+   * // Usage in log method
+   * const payload = this.createPayload<CustomPayloadType>(messageObject, level);
+   * ```
+   *
+   * @param messageObject
+   * @param level
+   *
+   * @return Payload of type T
+   */
+  createPayload<T>(messageObject: MessageObject, level: LogLevel): T;
+
+  /**
    * <h4>Logs a message object at the specified log level to a log destination</h4><br /><br />
    *
    * Remember to set the `isSettled` property to `true` when the promise is settled. <b><u>If `isSettled` is not set to true, the logger's flush function will hang indefinitely!</u></b><br /><br />
