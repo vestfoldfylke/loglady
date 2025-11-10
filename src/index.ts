@@ -26,7 +26,7 @@ export namespace logger {
    * Example:<br />
    * ```typescript
    * logConfig({
-   *   contextId: '12345-abcde-67890-fghij',
+   *   contextId: '12345-abcde-67890-abcde',
    *   prefix: 'Will be prepended to the beginning of each log message',
    *   suffix: 'Will be appended to the end of each log message',
    * });
