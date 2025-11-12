@@ -212,7 +212,7 @@ export namespace logger {
    * runInContext<HttpResponseInit>(context, async (): Promise<HttpResponseInit> => {
    *   // Your code here will have access to the logging context
    *   logger.info('This log will include the context ID from AsyncLocalStorage');
-   *   
+   *
    *   ....
    * });
    * ```
