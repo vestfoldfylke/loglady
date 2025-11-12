@@ -1,4 +1,5 @@
 import { Logger } from "./lib/logger.js";
+import { getInternalContext, setInternalContextProvider } from "./lib/logger-context.js";
 
 import type { MessageParameter, TrackedPromise } from "./types/log.types";
 import type { LogConfig } from "./types/log-config.types";
@@ -20,6 +21,8 @@ export namespace logger {
   }
 
   /**
+   * <h3>Only applicable when <u>not</u> using an <i>AsyncLocalStorage</i> through `setContextProvider`</h3>
+   *
    * Configure optional logging settings<br />
    * Can be called multiple times to update specific settings<br /><br />
    *
@@ -62,7 +65,8 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function debug(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, "DEBUG", undefined, ...params);
+    const logConfig: LogConfig = getInternalContext() ?? _logConfig;
+    _logger.log(logConfig, messageTemplate, "DEBUG", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -86,7 +90,8 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function info(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, "INFO", undefined, ...params);
+    const logConfig: LogConfig = getInternalContext() ?? _logConfig;
+    _logger.log(logConfig, messageTemplate, "INFO", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -110,7 +115,8 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function warn(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, "WARN", undefined, ...params);
+    const logConfig: LogConfig = getInternalContext() ?? _logConfig;
+    _logger.log(logConfig, messageTemplate, "WARN", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -134,7 +140,8 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function error(messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, "ERROR", undefined, ...params);
+    const logConfig: LogConfig = getInternalContext() ?? _logConfig;
+    _logger.log(logConfig, messageTemplate, "ERROR", undefined, ...params);
   }
 
   // noinspection JSUnusedGlobalSymbols
@@ -163,6 +170,57 @@ export namespace logger {
    * @param params - Parameters to replace placeholders in message template
    */
   export function errorException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
-    _logger.log(_logConfig, messageTemplate, "ERROR", exception, ...params);
+    const logConfig: LogConfig = getInternalContext() ?? _logConfig;
+    _logger.log(logConfig, messageTemplate, "ERROR", exception, ...params);
+  }
+
+  // noinspection JSUnusedGlobalSymbols
+  /**
+   * <h3>Only applicable when running the async request chain through an <i>AsyncLocalStorage</i></h3>
+   *
+   * Sets the context provider function to retrieve logging context from<br /><br />
+   *
+   * Add the following to a new file:<br />
+   * ```typescript
+   * import { AsyncLocalStorage } from "node:async_hooks";
+   *
+   * import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
+   *
+   * import { logger } from "@vestfoldfylke/loglady";
+   *
+   * const asyncLocalStorage = new AsyncLocalStorage<LogConfig>();
+   *
+   * export async function runInContext<T>(logConfig: LogConfig, callback: () => Promise<T>): Promise<T> {
+   *   logger.setContextProvider((): LogConfig => asyncLocalStorage.getStore());
+   *   return asyncLocalStorage.run(logConfig, callback);
+   * }
+   *
+   * export function updateContext(logConfig: LogConfig): void {
+   *   const _logConfig: LogConfig = asyncLocalStorage.getStore();
+   *   if (_logConfig) {
+   *     Object.assign(_logConfig, logConfig);
+   *   }
+   * }
+   * ```<br /><br />
+   *
+   * And call `runInContext` (preferable as soon as possible after request initialization)<br />
+   * ```typescript
+   * import { runInContext } from './file-path-created-from-file-above.js';
+   *
+   * const context: LogConfig = { contextId: '12345-abcde-67890-abcde' };
+   *
+   * runInContext<HttpResponseInit>(context, async (): Promise<HttpResponseInit> => {
+   *   // Your code here will have access to the logging context
+   *   logger.info('This log will include the context ID from AsyncLocalStorage');
+   *
+   *   ....
+   * });
+   * ```
+   *
+   * @param provider
+   */
+  //export function setContextProvider(provider: LogContextProvider): void {
+  export function setContextProvider(provider: () => LogConfig | undefined): void {
+    setInternalContextProvider(provider);
   }
 }

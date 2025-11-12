@@ -3,7 +3,7 @@
 
 # loglady 🪵
 
-loglady 🪵 is an opinionated, 0 dependency, TypeScript logger developed for and by [vestfoldfylke](https://github.com/vestfoldfylke)
+loglady 🪵 is an opinionated, 0 dependency, TypeScript logger developed for and by [Vestfold fylkeskommune](https://github.com/vestfoldfylke)
 
 > [!IMPORTANT]
 > Node.js >= 18 is required to use loglady.
@@ -103,7 +103,9 @@ loglady 🪵 automatically adds the following calling information to each log me
 ```typescript
 import { logger } from '@vestfoldfylke/loglady';
 
-// optionl settings to set before using the logger
+// optional settings to set before using the logger
+// NOTE: Should only be used when there is only one request using the logger at a time
+// NOTE: If used in an API with multiple concurrent requests, AsyncLocalStorage should be used to set contextId per request (see Advanced Usage below)
 logger.logConfig({
   contextId: 'some-unique-id-for-this-run', // set a context id to correlate log messages for a specific run (will be added as a property to each log message)
   prefix: 'something-to-show-before-every-message', // will be prepended to the beginning of each log message
@@ -122,4 +124,63 @@ logger.errorException(error, 'This is an error message with an exception with ad
 
 // flush any log messages not completed yet (applicable if asynchronous log destinations are used). If not called, the application may exit before all log messages are sent.
 await logger.flush();
+```
+
+### Advanced Usage with AsyncLocalStorage
+
+In an API with multiple concurrent requests, you can use `AsyncLocalStorage` to set a unique contextId for each request. This allows you to correlate log messages for a specific request.
+
+To use `AsyncLocalStorage`, you can call `runInContext` from a "middleware" that sets the contextId for each request.
+
+Create a new file called `loggerMiddleware.ts` or similar and add the following code:
+```typescript
+import { AsyncLocalStorage } from "node:async_hooks";
+
+import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
+
+import { logger } from "@vestfoldfylke/loglady";
+   
+const asyncLocalStorage = new AsyncLocalStorage<LogConfig>();
+
+// Runs the provided callback function within a context containing the provided LogConfig.
+export async function runInContext<T>(logConfig: LogConfig, callback: () => Promise<T>): Promise<T> {
+  logger.setContextProvider((): LogConfig => asyncLocalStorage.getStore());
+  return asyncLocalStorage.run(logConfig, callback);
+}
+
+// Updates the current context's LogConfig with the provided values.
+export function updateContext(logConfig: LogConfig): void {
+  const _logConfig: LogConfig = asyncLocalStorage.getStore();
+  if (_logConfig) {
+    Object.assign(_logConfig, logConfig);
+  }
+}
+```
+
+Then, create a "middleware" file called `errorHandling` which your API request handler calls. Here you can use the `runInContext` function to set the contextId for each request:
+```typescript
+import type { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
+import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
+
+import { logger } from "@vestfoldfylke/loglady";
+
+import { runInContext } from "./loggerMiddleware.js";
+
+export async function errorHandling(request: HttpRequest, context: InvocationContext, next: (request: HttpRequest, context: InvocationContext) => Promise<HttpResponseInit>): Promise<HttpResponseInit> {
+  const logContext: LogConfig = {
+    contextId: context.invocationId
+  };
+
+  try {
+    return await runInContext<HttpResponseInit>(logContext, async (): Promise<HttpResponseInit> => await next(request, context));
+  } catch (error) {
+    logger.errorException(error, "Error on {Method} to {Url} with status {Status}", request.method, request.url, 400);
+    return {
+      status: 400,
+      body: error.message
+    };
+  } finally {
+    await logger.flush();
+  }
+}
 ```
