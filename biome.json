@@ -12,14 +12,15 @@
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "expand": "auto"
+    "expand": "auto",
+    "includes": ["**", "!dist", "!node_modules", "!!package.json"]
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true
     },
-    "includes": ["**", "!dist", "!node_modules"]
+    "includes": ["**", "!!rollup.config.mjs", "!dist", "!node_modules"]
   },
   "javascript": {
     "formatter": {

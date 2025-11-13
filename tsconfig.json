@@ -3,14 +3,13 @@
   "compilerOptions": {
     // File Layout
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./dist/types",
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "ESNext",
-    "target": "esnext",
-    "lib": ["esnext"],
-    "types": ["node"],
+    "target": "ES2020",
+    "lib": ["ESNext"],
 
     // Other Outputs
     "sourceMap": true,
@@ -31,15 +30,16 @@
     "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
-    "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "strict": true,
-    "verbatimModuleSyntax": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "emitDeclarationOnly": true,
+    "importHelpers": false
   },
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"]
 }
