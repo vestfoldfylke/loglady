@@ -10,7 +10,7 @@ import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
  * If the destination adds any custom environment variables to control its behavior, <b><u>document them in the README.md file!</u></b><br /><br />
  *
  * Example implementation:
- * ```typescript
+ * ```TypeScript
  * import type { LogDestination } from '../../types/LogDestination.types';
  * import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
  * import type { MinimalPackage } from '../../types/minimal-package.types';
@@ -37,6 +37,14 @@ import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
  *     this._pkg = pkg;
  *   }
  *
+ *   createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
+ *     return {
+ *       timestamp: new Date().toISOString(),
+ *       level,
+ *       ...messageObject
+ *     } as T;
+ *   }
+ *
  *   log(messageObject: MessageObject, level: LogLevel): TrackedPromise {
  *     if (!canLogAtLevel(level, this._minLogLevel)) {
  *       return {
@@ -45,6 +53,8 @@ import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
  *         isSettled: true
  *       };
  *     }
+ *
+ *     const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
  *
  *     // Custom logging logic here
  *
@@ -62,7 +72,7 @@ export interface LogDestination {
    * Indicates whether the destination is active and should receive log messages. Can be overridden by environment variables (check README)<br /><br />
    *
    * Should be set in the constructor of the implementing class based on environment variables
-   * ```typescript
+   * ```TypeScript
    * constructor() {
    *   // set your own logic to determine if the destination is active based on environment variables or other criteria
    *   this.active = process.env['SOME_ENV_VAR'] !== undefined;
@@ -82,7 +92,7 @@ export interface LogDestination {
    * This method must be implemented in the log destination to be able to test the payload creation separately from the logging logic.<br /><br />
    *
    * Example usage:
-   * ```typescript
+   * ```TypeScript
    * createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
    *   return {
    *     timestamp: new Date().toISOString(),
@@ -92,7 +102,7 @@ export interface LogDestination {
    * }
    *
    * // Usage in log method
-   * const payload = this.createPayload<CustomPayloadType>(messageObject, level);
+   * const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
    * ```
    *
    * @param messageObject
@@ -109,13 +119,15 @@ export interface LogDestination {
    *
    * <h3>Asynchronous logging</h3>
    * If the destination supports asynchronous logging, it should return a **TrackedPromise** that resolves when logging is complete:
-   * ```typescript
+   * ```TypeScript
+   * const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
+   *
    * const logPromise = fetch(endpointUrl, {
    *   method: 'POST',
    *   headers: {
    *     'Content-Type': 'application/json'
    *   },
-   *   body: JSON.stringify(messageObject)
+   *   body: JSON.stringify(payload)
    * });
    *
    * const trackedPromise: TrackedPromise = {
@@ -133,7 +145,9 @@ export interface LogDestination {
    *
    * <h3>Synchronous logging</h3>
    * If the destination does not support asynchronous logging, it should return a resolved **TrackedPromise** after logging is complete:
-   * ```typescript
+   * ```TypeScript
+   * const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
+   *
    * // logging logic here
    *
    * return {

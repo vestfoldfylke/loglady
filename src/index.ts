@@ -27,7 +27,7 @@ export namespace logger {
    * Can be called multiple times to update specific settings<br /><br />
    *
    * Example:<br />
-   * ```typescript
+   * ```TypeScript
    * logConfig({
    *   contextId: '12345-abcde-67890-abcde',
    *   prefix: 'Will be prepended to the beginning of each log message',
@@ -50,7 +50,7 @@ export namespace logger {
    *
    * <b>If placeholders are used in the message template, equal amount of parameters must be provided</b><br /><br />
    * Example:<br />
-   * ```typescript
+   * ```TypeScript
    * const username = 'john_doe';
    * const ipAddress = '127.0.0.1';
    *
@@ -75,7 +75,7 @@ export namespace logger {
    *
    * <b>If placeholders are used in the message template, equal amount of parameters must be provided</b><br /><br />
    * Example:<br />
-   * ```typescript
+   * ```TypeScript
    * const username = 'john_doe';
    * const ipAddress = '127.0.0.1';
    *
@@ -100,7 +100,7 @@ export namespace logger {
    *
    * <b>If placeholders are used in the message template, equal amount of parameters must be provided</b><br /><br />
    * Example:<br />
-   * ```typescript
+   * ```TypeScript
    * const applicationName = 'foo';
    * const minutes = 3;
    *
@@ -125,7 +125,7 @@ export namespace logger {
    *
    * <b>If placeholders are used in the message template, equal amount of parameters must be provided</b><br /><br />
    * Example:<br />
-   * ```typescript
+   * ```TypeScript
    * const applicationName = 'foo';
    * const minutes = 3;
    *
@@ -150,7 +150,7 @@ export namespace logger {
    *
    * <b>If placeholders are used in the message template, equal amount of parameters must be provided</b><br /><br />
    * Example:<br />
-   * ```typescript
+   * ```TypeScript
    * const applicationName = 'foo';
    * const minutes = 3;
    *
@@ -181,7 +181,7 @@ export namespace logger {
    * Sets the context provider function to retrieve logging context from<br /><br />
    *
    * Add the following to a new file:<br />
-   * ```typescript
+   * ```TypeScript
    * import { AsyncLocalStorage } from "node:async_hooks";
    *
    * import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
@@ -204,7 +204,7 @@ export namespace logger {
    * ```<br /><br />
    *
    * And call `runInContext` (preferable as soon as possible after request initialization)<br />
-   * ```typescript
+   * ```TypeScript
    * import { runInContext } from './file-path-created-from-file-above.js';
    *
    * const context: LogConfig = { contextId: '12345-abcde-67890-abcde' };
@@ -213,13 +213,12 @@ export namespace logger {
    *   // Your code here will have access to the logging context
    *   logger.info('This log will include the context ID from AsyncLocalStorage');
    *
-   *   ....
+   *   // the rest of your request handling code
    * });
    * ```
    *
    * @param provider
    */
-  //export function setContextProvider(provider: LogContextProvider): void {
   export function setContextProvider(provider: () => LogConfig | undefined): void {
     setInternalContextProvider(provider);
   }

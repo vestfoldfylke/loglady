@@ -19,7 +19,7 @@ describe("BetterStack log destination", () => {
 
   it("should be active when environment variable 'BETTERSTACK_URL' AND 'BETTERSTACK_TOKEN' is set", () => {
     process.env["BETTERSTACK_URL"] = "https://example.betterstack.com";
-    process.env["BETTERSTACK_TOKEN"] = "exampletoken";
+    process.env["BETTERSTACK_TOKEN"] = "example-token";
 
     const betterStackInstance = new BetterStack(minimalPackage);
 
@@ -41,7 +41,7 @@ describe("BetterStack log destination", () => {
   });
 
   it("should NOT be active when environment variable 'BETTERSTACK_URL' is not set but 'BETTERSTACK_TOKEN' is set", () => {
-    process.env["BETTERSTACK_TOKEN"] = "exampletoken";
+    process.env["BETTERSTACK_TOKEN"] = "example-token";
 
     const betterStackInstance = new BetterStack(minimalPackage);
 
