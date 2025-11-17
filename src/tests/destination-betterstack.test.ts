@@ -10,6 +10,8 @@ import { minimalPackage } from "./lib/minimal-package";
 
 const originalEnv = { ...process.env };
 
+const logLevels: string[] = ["debug", "info", "warn", "error", "DEBUG", "INFO", "WARN", "ERROR"];
+
 describe("BetterStack log destination", () => {
   afterEach(() => {
     process.env = { ...originalEnv };
@@ -79,5 +81,27 @@ describe("BetterStack log destination", () => {
 
     assert.notEqual(payload, null, "Payload should not be null");
     assert.notEqual(payload.exception, null, "Payload should include exception when present in messageObject");
+  });
+
+  logLevels.forEach((level: string) => {
+    it(`should support log level ${level}`, () => {
+      process.env["BETTERSTACK_MIN_LOG_LEVEL"] = level;
+
+      try {
+        new BetterStack(minimalPackage);
+        assert.ok(true, `Log level ${level} should be supported`);
+      } catch (error) {
+        assert.ok(false, `Log level ${level} should be supported, but error occurred: ${(error as Error).message}`);
+      }
+    });
+  });
+
+  it("should support default log level", () => {
+    try {
+      new BetterStack(minimalPackage);
+      assert.ok(true, "Default log level should be supported");
+    } catch (error) {
+      assert.ok(false, `Default log level should be supported, but error occurred: ${(error as Error).message}`);
+    }
   });
 });

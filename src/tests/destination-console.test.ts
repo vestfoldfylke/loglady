@@ -8,6 +8,8 @@ import type { MessageObject } from "../types/log.types";
 
 import { minimalPackage } from "./lib/minimal-package";
 
+const logLevels: string[] = ["debug", "info", "warn", "error", "DEBUG", "INFO", "WARN", "ERROR"];
+
 describe("Console log destination", () => {
   it("should be active when environment variable 'CONSOLE_ENABLED' is not set", () => {
     const consoleInstance = new Console(minimalPackage);
@@ -60,5 +62,27 @@ describe("Console log destination", () => {
 
     assert.notEqual(payload, null, "Payload should not be null");
     assert.ok(payload.length === 3, "Payload should have 3 parts when ContextId is not present");
+  });
+
+  logLevels.forEach((level: string) => {
+    it(`should support log level ${level}`, () => {
+      process.env["CONSOLE_MIN_LOG_LEVEL"] = level;
+
+      try {
+        new Console(minimalPackage);
+        assert.ok(true, `Log level ${level} should be supported`);
+      } catch (error) {
+        assert.ok(false, `Log level ${level} should be supported, but error occurred: ${(error as Error).message}`);
+      }
+    });
+  });
+
+  it("should support default log level", () => {
+    try {
+      new Console(minimalPackage);
+      assert.ok(true, "Default log level should be supported");
+    } catch (error) {
+      assert.ok(false, `Default log level should be supported, but error occurred: ${(error as Error).message}`);
+    }
   });
 });

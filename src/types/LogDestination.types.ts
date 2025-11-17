@@ -15,7 +15,7 @@ import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
  * import type { LogLevel, MessageObject, TrackedPromise } from '../../types/log.types';
  * import type { MinimalPackage } from '../../types/minimal-package.types';
  *
- * import { canLogAtLevel } from '../../lib/log-level.js';
+ * import { canLogAtLevel, validateLogLevel } from '../../lib/log-level.js';
  *
  * export default class CustomDestination implements LogDestination {
  *   readonly active: boolean;
@@ -30,6 +30,10 @@ import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
  *     this.active = process.env['SOME_ENV'] !== undefined;
  *
  *     this._minLogLevel = (process.env['SOME_ENV_MIN_LOG_LEVEL'] as LogLevel) || 'ERROR';
+ *     if (!validateLogLevel(this._minLogLevel)) {
+ *       throw new Error(`Invalid SOME_ENV_MIN_LOG_LEVEL value: ${process.env["SOME_ENV_MIN_LOG_LEVEL"]}`);
+ *     }
+ *
  *     this._pkg = pkg;
  *   }
  *

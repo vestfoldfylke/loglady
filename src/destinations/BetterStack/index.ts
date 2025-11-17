@@ -1,4 +1,4 @@
-import { canLogAtLevel } from "../../lib/log-level.js";
+import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
 
 import type { BetterStackPayload } from "../../types/destinations/betterstack.types";
 import type { LogDestination } from "../../types/LogDestination.types";
@@ -32,6 +32,10 @@ export default class BetterStackDestination implements LogDestination {
     this._token = process.env["BETTERSTACK_TOKEN"];
 
     this._minLogLevel = (process.env["BETTERSTACK_MIN_LOG_LEVEL"] as LogLevel) || "INFO";
+    if (!validateLogLevel(this._minLogLevel)) {
+      throw new Error(`Invalid BETTERSTACK_MIN_LOG_LEVEL value: ${process.env["BETTERSTACK_MIN_LOG_LEVEL"]}`);
+    }
+
     this._pkg = pkg;
 
     this.active = this._endpoint !== undefined && this._token !== undefined;

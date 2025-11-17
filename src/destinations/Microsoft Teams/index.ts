@@ -1,4 +1,4 @@
-import { canLogAtLevel } from "../../lib/log-level.js";
+import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
 
 import type {
   MicrosoftTeamsColor,
@@ -32,6 +32,10 @@ export default class MicrosoftTeamsDestination implements LogDestination {
 
   constructor(pkg: MinimalPackage) {
     this._minLogLevel = (process.env["TEAMS_MIN_LOG_LEVEL"] as LogLevel) || "ERROR";
+    if (!validateLogLevel(this._minLogLevel)) {
+      throw new Error(`Invalid TEAMS_MIN_LOG_LEVEL value: ${process.env["TEAMS_MIN_LOG_LEVEL"]}`);
+    }
+
     this._pkg = pkg;
     this._webhookUrl = process.env["TEAMS_WEBHOOK_URL"];
 
