@@ -64,7 +64,7 @@ loglady 🪵 is built with extensibility in mind. A new log destination can be c
 The `MessageObject` is the object that is sent to each log destination. It contains the following properties:
 - `messageTemplate`: The message template
 - `message`: The formatted message (with parameters applied if any)
-- `properties`: An object containing additional properties (e.g. runtime information, parameters and calling information)
+- `properties`: An object containing additional properties (e.g. runtime information, parameters, calling information and potential logConfig)
 - `exception`: An optional exception object (if passed to the errorException log function)
 
 ### Runtime information
