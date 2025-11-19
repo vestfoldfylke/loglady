@@ -171,16 +171,18 @@ export async function errorHandling(request: HttpRequest, context: InvocationCon
     contextId: context.invocationId
   };
 
-  try {
-    return await runInContext<HttpResponseInit>(logContext, async (): Promise<HttpResponseInit> => await next(request, context));
-  } catch (error) {
-    logger.errorException(error, "Error on {Method} to {Url} with status {Status}", request.method, request.url, 400);
-    return {
-      status: 400,
-      body: error.message
-    };
-  } finally {
-    await logger.flush();
-  }
+  return await runInContext<HttpResponseInit>(logContext, async (): Promise<HttpResponseInit> => {
+    try {
+      return await next(request, context);
+    } catch (error) {
+      logger.errorException(error, "Error on {Method} to {Url} with status {Status}", request.method, request.url, 400);
+      return {
+        status: 400,
+        body: error.message
+      };
+    } finally {
+      await logger.flush();
+    }
+  });
 }
 ```
