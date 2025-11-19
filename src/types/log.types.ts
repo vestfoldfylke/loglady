@@ -6,7 +6,7 @@ export type CallingInfo = {
   columnNumber: number;
 };
 
-export type LogLevel = "DEBUG" | "INFO" | "WARN" | "ERROR";
+export type LogLevel = "debug" | "info" | "warn" | "error" | "DEBUG" | "INFO" | "WARN" | "ERROR";
 
 export type MessageParameter = string | number | bigint | boolean | object | [] | undefined | null;
 

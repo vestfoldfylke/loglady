@@ -10,6 +10,8 @@ import { minimalPackage } from "./lib/minimal-package";
 
 const originalEnv = { ...process.env };
 
+const logLevels: string[] = ["debug", "info", "warn", "error", "DEBUG", "INFO", "WARN", "ERROR"];
+
 describe("Microsoft Teams log destination", () => {
   afterEach(() => {
     process.env = { ...originalEnv };
@@ -175,5 +177,27 @@ describe("Microsoft Teams log destination", () => {
       ),
       "Payload body ActionSet actions should be the links from TEAMS_LINKS environment variable"
     );
+  });
+
+  logLevels.forEach((level: string) => {
+    it(`should support log level ${level}`, () => {
+      process.env["TEAMS_MIN_LOG_LEVEL"] = level;
+
+      try {
+        new MicrosoftTeams(minimalPackage);
+        assert.ok(true, `Log level ${level} should be supported`);
+      } catch (error) {
+        assert.ok(false, `Log level ${level} should be supported, but error occurred: ${(error as Error).message}`);
+      }
+    });
+  });
+
+  it("should support default log level", () => {
+    try {
+      new MicrosoftTeams(minimalPackage);
+      assert.ok(true, "Default log level should be supported");
+    } catch (error) {
+      assert.ok(false, `Default log level should be supported, but error occurred: ${(error as Error).message}`);
+    }
   });
 });

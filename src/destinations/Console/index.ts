@@ -1,4 +1,4 @@
-import { canLogAtLevel } from "../../lib/log-level.js";
+import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
 
 import type { ConsolePayload } from "../../types/destinations/console.types";
 import type { LogDestination } from "../../types/LogDestination.types";
@@ -28,6 +28,10 @@ export default class ConsoleDestination implements LogDestination {
     const active: string | boolean | undefined = process.env["CONSOLE_ENABLED"];
 
     this._minLogLevel = (process.env["CONSOLE_MIN_LOG_LEVEL"] as LogLevel) || "DEBUG";
+    if (!validateLogLevel(this._minLogLevel)) {
+      throw new Error(`Invalid CONSOLE_MIN_LOG_LEVEL value: ${process.env["CONSOLE_MIN_LOG_LEVEL"]}`);
+    }
+
     this._pkg = pkg;
 
     this.active = active === undefined ? true : String(active).trim().toLowerCase() === "true";

@@ -17,10 +17,10 @@ loglady 🪵 supports the following log destinations:
 - Microsoft Teams
 
 The following log levels are supported and can be set as the minimum log level for each destination that supports an environment variable for this:
-- DEBUG
-- INFO
-- WARN
-- ERROR
+- DEBUG / debug
+- INFO / info
+- WARN / warn
+- ERROR / error
 
 ### BetterStack destination
 
@@ -91,7 +91,7 @@ loglady 🪵 automatically adds the following calling information to each log me
   "BETTERSTACK_TOKEN": "your-betterstack-token",
   "BETTERSTACK_MIN_LOG_LEVEL": "WARN",
   "CONSOLE_ENABLED": "true",
-  "CONSOLE_MIN_LOG_LEVEL": "DEBUG",
+  "CONSOLE_MIN_LOG_LEVEL": "debug",
   "TEAMS_WEBHOOK_URL": "https://your-teams-webhook-url",
   "TEAMS_MIN_LOG_LEVEL": "ERROR",
   "TEAMS_LINKS": "LogSystem;https://somelogprovider.com/whatever,Coffee;https://letmegooglethat.com/?q=coffee",
