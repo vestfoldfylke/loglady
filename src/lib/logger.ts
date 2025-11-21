@@ -56,7 +56,6 @@ export class Logger {
 
       const pascalCase: string = key.charAt(0).toUpperCase() + key.slice(1);
       properties[pascalCase] = value;
-      console.log(`'${pascalCase}' added to properties with value: '${value}'`);
     });
 
     const callingInfo: CallingInfo | undefined = this.getCallingInfo();
