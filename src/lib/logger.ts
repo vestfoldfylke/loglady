@@ -48,9 +48,16 @@ export class Logger {
       properties["EnvironmentName"] = this._runtimeInfo.environmentName;
     }
 
-    if (logConfig.contextId) {
-      properties["ContextId"] = logConfig.contextId;
-    }
+    // Add logConfig properties in PascalCase to properties
+    Object.entries(logConfig).forEach(([key, value]: [string, string | undefined]): void => {
+      if (!value) {
+        return;
+      }
+
+      const pascalCase: string = key.charAt(0).toUpperCase() + key.slice(1);
+      properties[pascalCase] = value;
+      console.log(`'${pascalCase}' added to properties with value: '${value}'`);
+    });
 
     const callingInfo: CallingInfo | undefined = this.getCallingInfo();
     if (callingInfo !== undefined) {
