@@ -48,7 +48,7 @@
   "license": "MIT",
   "description": "My log has something to tell you",
   "devDependencies": {
-    "@biomejs/biome": "2.3.3",
+    "@biomejs/biome": "2.3.7",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^0.4.4",
