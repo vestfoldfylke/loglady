@@ -5,6 +5,8 @@ import type { LogDestination } from "../../types/LogDestination.types";
 import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
 import type { MinimalPackage } from "../../types/minimal-package.types";
 
+import { colorDebug, colorError, colorInfo, colorWarn } from "./ansi-console.js";
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
@@ -59,24 +61,24 @@ export default class ConsoleDestination implements LogDestination {
 
     switch (level) {
       case "DEBUG":
-        console.debug(...payload);
+        colorDebug(...payload);
         break;
       case "INFO":
-        console.info(...payload);
+        colorInfo(...payload);
         break;
       case "WARN":
-        console.warn(...payload);
+        colorWarn(...payload);
         break;
       case "ERROR":
         if (messageObject.exception !== undefined) {
-          console.error(...payload, "--->", messageObject.exception);
+          colorError(...payload, "--->", messageObject.exception);
           break;
         }
 
-        console.error(...payload);
+        colorError(...payload);
         break;
       default:
-        console.log(...payload);
+        colorInfo(...payload);
     }
 
     return {
