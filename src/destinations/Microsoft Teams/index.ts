@@ -255,9 +255,11 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       isSettled: false
     };
 
-    promise.finally((): void => {
-      trackedPromise.isSettled = true;
-    });
+    promise
+      .catch((error: unknown) => console.error(`Failed to log message to ${this.name}`, "--->", error))
+      .finally((): void => {
+        trackedPromise.isSettled = true;
+      });
 
     return trackedPromise;
   }
