@@ -6,7 +6,7 @@
 loglady 🪵 is an opinionated, 0 dependency, TypeScript logger developed for and by [Vestfold fylkeskommune](https://github.com/vestfoldfylke)
 
 > [!IMPORTANT]
-> Node.js >= 18 is required to use loglady.
+> Node.js >= 18 is required to use loglady 🪵.
 
 ## Log destinations
 
@@ -56,8 +56,11 @@ loglady 🪵 is built with extensibility in mind. A new log destination can be c
 5. Import the new destination class in `src/index.ts` and add it to the `destinations` array in the `Logger` class constructor.
 
 > [!CAUTION]
-> If your `log` function calls something asynchronously, make sure that your `log` function sets the `isSettled` property on the **TrackedPromise** to `true` when the promise is settled.<br />
-> <b><u>If `isSettled` is never set to `true`, the logger's flush function will hang indefinitely!</u></b>
+> If your `log` function calls something asynchronously, make sure:
+> - That your `log` function sets the `isSettled` property on the **TrackedPromise** to `true` when the promise is settled.
+>   - <b><u>If `isSettled` is never set to `true`, the logger's flush function will hang indefinitely!</u></b>
+> - **ALWAYS** catch any errors in a catch method on the promise.
+>   - <b><u>An uncaught exception can kill the app using loglady 🪵.</u></b>
 
 ### MessageObject
 
