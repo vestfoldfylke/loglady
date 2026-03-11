@@ -115,7 +115,9 @@ export interface LogDestination {
   /**
    * <h4>Logs a message object at the specified log level to a log destination</h4><br /><br />
    *
-   * Remember to set the `isSettled` property to `true` when the promise is settled. <b><u>If `isSettled` is not set to true, the logger's flush function will hang indefinitely!</u></b><br /><br />
+   * Remember to:<br />
+   * - set the `isSettled` property to `true` when the promise is settled. <b><u>If `isSettled` is not set to true, the logger's flush function will hang indefinitely!</u></b>
+   * - catch any errors in a catch method on the promise. <b><u>An uncaught exception can kill the app using loglady 🪵</u></b>
    *
    * <h3>Asynchronous logging</h3>
    * If the destination supports asynchronous logging, it should return a **TrackedPromise** that resolves when logging is complete:
@@ -136,9 +138,12 @@ export interface LogDestination {
    *   isSettled: false
    * };
    *
-   * logPromise.finally(() => {
-   *   trackedPromise.isSettled = true;
-   * });
+   * // CAUTION: ALWAYS catch any errors that may happen. An uncaught exception can kill the app using loglady 🪵
+   * promise
+   *  .catch((error: unknown) => console.error(`Failed to log message to ${this.name}`, "--->", error))
+   *  .finally((): void => {
+   *    trackedPromise.isSettled = true;
+   *  });
    *
    * return trackedPromise;
    * ```
