@@ -46,8 +46,8 @@ describe("loglady 🪵  should not throw errors during logging", () => {
 
     it(`when "${level}" is called with messageTemplate and 1 parameter`, () => {
       assert.doesNotThrow(() => {
-        const output = mockStdoutAndCallLogger(() => logFunction.call(logger, `This is ${level} message: {Message}`, "loglady test"));
-        assert.ok(output.includes(": loglady test"));
+        const output = mockStdoutAndCallLogger(() => logFunction.call(logger, `This is ${level} message: {Message}`, "loglady 🪵 test"));
+        assert.ok(output.includes(": loglady 🪵 test"));
         assert.ok(!output.includes(": NULL"));
       });
     });
@@ -78,8 +78,10 @@ describe("loglady 🪵  should not throw errors during logging", () => {
 
   it('when "error" is called with exception, messageTemplate and 1 parameter', () => {
     assert.doesNotThrow(() => {
-      const output = mockStdoutAndCallLogger(() => logger.errorException(new Error("Test"), "This is an error message: {Message}", "loglady test"));
-      assert.ok(output.includes(": loglady test"));
+      const output = mockStdoutAndCallLogger(() =>
+        logger.errorException(new Error("Test"), "This is an error message: {Message}", "loglady 🪵 test")
+      );
+      assert.ok(output.includes(": loglady 🪵 test"));
       assert.ok(!output.includes(": NULL"));
     });
   });
@@ -108,7 +110,7 @@ describe("loglady 🪵  should throw errors during logging", () => {
     });
 
     it(`when "${level}" is called with messageTemplate with 1 placeholder but 2 parameters`, () => {
-      assert.throws(() => logFunction.call(logger, `This is ${level} message: {Message}`, "loglady test", "makes no sense"));
+      assert.throws(() => logFunction.call(logger, `This is ${level} message: {Message}`, "loglady 🪵 test", "makes no sense"));
     });
   });
 
@@ -117,7 +119,7 @@ describe("loglady 🪵  should throw errors during logging", () => {
   });
 
   it('when "error" is called with exception and messageTemplate with 1 placeholder but 2 parameters', () => {
-    assert.throws(() => logger.errorException(new Error("Test"), "This is an error message: {Message}", "loglady test", "makes no sense"));
+    assert.throws(() => logger.errorException(new Error("Test"), "This is an error message: {Message}", "loglady 🪵 test", "makes no sense"));
   });
 });
 

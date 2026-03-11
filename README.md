@@ -6,7 +6,7 @@
 loglady 🪵 is an opinionated, 0 dependency, TypeScript logger developed for and by [Vestfold fylkeskommune](https://github.com/vestfoldfylke)
 
 > [!IMPORTANT]
-> Node.js >= 18 is required to use loglady.
+> Node.js >= 18 is required to use loglady 🪵.
 
 ## Log destinations
 
