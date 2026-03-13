@@ -6,6 +6,14 @@ export type CallingInfo = {
   columnNumber: number;
 };
 
+export type ConsoleColors = {
+  fgCyan: string;
+  fgRed: string;
+  fgWhite: string;
+  fgYellow: string;
+  reset: string;
+};
+
 export type LogLevel = "debug" | "info" | "warn" | "error" | "DEBUG" | "INFO" | "WARN" | "ERROR";
 
 export type MessageParameter = string | number | bigint | boolean | object | [] | undefined | null;

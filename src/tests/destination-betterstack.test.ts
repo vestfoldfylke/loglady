@@ -104,4 +104,33 @@ describe("BetterStack log destination", () => {
       assert.ok(false, `Default log level should be supported, but error occurred: ${(error as Error).message}`);
     }
   });
+
+  it("should catch and log errors during message POST request", () => {
+    process.env["BETTERSTACK_URL"] = "https://example.betterstack.com";
+    process.env["BETTERSTACK_TOKEN"] = "example-token";
+
+    const betterStackInstance = new BetterStack(minimalPackage);
+
+    // Simulate an error during the POST request by mocking the fetch function
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = async () => {
+      throw new Error("Simulated network error");
+    };
+
+    const messageObject: MessageObject = {
+      messageTemplate: "Test message for error handling",
+      message: "Test message for error handling",
+      properties: {}
+    };
+
+    try {
+      betterStackInstance.log(messageObject, "WARN");
+      assert.ok(true, "Error during POST request should be caught and logged");
+    } catch (error) {
+      assert.ok(false, `Error during POST request should be caught and logged, but error occurred: ${(error as Error).message}`);
+    } finally {
+      // Restore the original fetch function
+      globalThis.fetch = originalFetch;
+    }
+  });
 });

@@ -10,6 +10,8 @@ import type { LogDestination } from "../../types/LogDestination.types";
 import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from "../../types/log.types";
 import type { MinimalPackage } from "../../types/minimal-package.types";
 
+import { colors } from "../Console/ansi-console";
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
@@ -238,7 +240,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       };
     }
 
-    const payload: MicrosoftTeamsPayload = this.createPayload<MicrosoftTeamsPayload>(messageObject, level);
+    const messagePayload: MicrosoftTeamsPayload = this.createPayload<MicrosoftTeamsPayload>(messageObject, level);
 
     const promise: Promise<Response> = fetch(this._webhookUrl as string, {
       method: "POST",
@@ -246,7 +248,7 @@ export default class MicrosoftTeamsDestination implements LogDestination {
       headers: {
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(messagePayload)
     });
 
     const trackedPromise: TrackedPromise = {
@@ -256,7 +258,14 @@ export default class MicrosoftTeamsDestination implements LogDestination {
     };
 
     promise
-      .catch((error: unknown) => console.error(`Failed to log message to ${this.name}`, "--->", error))
+      .catch((error: unknown) =>
+        console.error(
+          `${colors.fgRed}Failed to log message to ${this.name}. Message:${colors.reset}`,
+          messagePayload,
+          `${colors.fgRed}--->${colors.reset}`,
+          error
+        )
+      )
       .finally((): void => {
         trackedPromise.isSettled = true;
       });
