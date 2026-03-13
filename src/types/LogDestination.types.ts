@@ -54,7 +54,7 @@ import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
  *       };
  *     }
  *
- *     const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
+ *     const messagePayload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
  *
  *     // Custom logging logic here
  *
@@ -102,7 +102,7 @@ export interface LogDestination {
    * }
    *
    * // Usage in log method
-   * const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
+   * const messagePayload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
    * ```
    *
    * @param messageObject
@@ -122,7 +122,7 @@ export interface LogDestination {
    * <h3>Asynchronous logging</h3>
    * If the destination supports asynchronous logging, it should return a **TrackedPromise** that resolves when logging is complete:
    * ```TypeScript
-   * const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
+   * const messagePayload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
    *
    * const logPromise = fetch(endpointUrl, {
    *   method: 'POST',
@@ -140,10 +140,17 @@ export interface LogDestination {
    *
    * // CAUTION: ALWAYS catch any errors that may happen. An uncaught exception can kill the app using loglady 🪵
    * promise
-   *  .catch((error: unknown) => console.error(`Failed to log message to ${this.name}`, "--->", error))
-   *  .finally((): void => {
-   *    trackedPromise.isSettled = true;
-   *  });
+   *   .catch((error: unknown) =>
+   *     console.error(
+   *       `${colors.fgRed}Failed to log message to ${this.name}. Message:${colors.reset}`,
+   *       messagePayload,
+   *       `${colors.fgRed}--->${colors.reset}`,
+   *       error
+   *     )
+   *   )
+   *   .finally((): void => {
+   *     trackedPromise.isSettled = true;
+   *   });
    *
    * return trackedPromise;
    * ```
@@ -151,7 +158,7 @@ export interface LogDestination {
    * <h3>Synchronous logging</h3>
    * If the destination does not support asynchronous logging, it should return a resolved **TrackedPromise** after logging is complete:
    * ```TypeScript
-   * const payload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
+   * const messagePayload: CustomPayloadType = this.createPayload<CustomPayloadType>(messageObject, level);
    *
    * // logging logic here
    *

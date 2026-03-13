@@ -57,28 +57,28 @@ export default class ConsoleDestination implements LogDestination {
       };
     }
 
-    const payload: ConsolePayload = this.createPayload<ConsolePayload>(messageObject, level);
+    const messagePayload: ConsolePayload = this.createPayload<ConsolePayload>(messageObject, level);
 
     switch (level) {
       case "DEBUG":
-        colorDebug(...payload);
+        colorDebug(...messagePayload);
         break;
       case "INFO":
-        colorInfo(...payload);
+        colorInfo(...messagePayload);
         break;
       case "WARN":
-        colorWarn(...payload);
+        colorWarn(...messagePayload);
         break;
       case "ERROR":
         if (messageObject.exception !== undefined) {
-          colorError(...payload, "--->", messageObject.exception);
+          colorError(...messagePayload, "--->", messageObject.exception);
           break;
         }
 
-        colorError(...payload);
+        colorError(...messagePayload);
         break;
       default:
-        colorInfo(...payload);
+        colorInfo(...messagePayload);
     }
 
     return {

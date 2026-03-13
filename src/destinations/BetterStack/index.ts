@@ -5,6 +5,8 @@ import type { LogDestination } from "../../types/LogDestination.types";
 import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
 import type { MinimalPackage } from "../../types/minimal-package.types";
 
+import { colors } from "../Console/ansi-console.js";
+
 // noinspection JSUnusedGlobalSymbols
 /**
  * @internal
@@ -58,7 +60,7 @@ export default class BetterStackDestination implements LogDestination {
       };
     }
 
-    const betterStackMessage: BetterStackPayload = this.createPayload<BetterStackPayload>(messageObject, level);
+    const messagePayload: BetterStackPayload = this.createPayload<BetterStackPayload>(messageObject, level);
 
     const promise: Promise<Response> = fetch(this._endpoint as string, {
       method: "POST",
@@ -67,7 +69,7 @@ export default class BetterStackDestination implements LogDestination {
         "Content-Type": "application/json",
         Authorization: `Bearer ${this._token}`
       },
-      body: JSON.stringify(betterStackMessage)
+      body: JSON.stringify(messagePayload)
     });
 
     const trackedPromise: TrackedPromise = {
@@ -77,7 +79,14 @@ export default class BetterStackDestination implements LogDestination {
     };
 
     promise
-      .catch((error: unknown) => console.error(`Failed to log message to ${this.name}`, "--->", error))
+      .catch((error: unknown) =>
+        console.error(
+          `${colors.fgRed}Failed to log message to ${this.name}. Message:${colors.reset}`,
+          messagePayload,
+          `${colors.fgRed}--->${colors.reset}`,
+          error
+        )
+      )
       .finally((): void => {
         trackedPromise.isSettled = true;
       });
