@@ -125,6 +125,9 @@ logger.error('This is an error message without an exception with ErrorMessage: {
 logger.errorException(error, 'This is an error message with an exception but without additional parameters');
 logger.errorException(error, 'This is an error message with an exception with additional parameters: ErrorMessage: {ErrorMessage}', error.message);
 
+// prefix template parameter with "@" to JSON.stringify object and array params
+logger.info('This is an info message for User {@User}', { name: "John Doe", username: "john@doe.com" });
+
 // flush any log messages not completed yet (applicable if asynchronous log destinations are used). If not called, the application may exit before all log messages are sent.
 await logger.flush();
 ```
@@ -139,9 +142,7 @@ Create a new file called `loggerMiddleware.ts` or similar and add the following 
 ```typescript
 import { AsyncLocalStorage } from "node:async_hooks";
 
-import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
-
-import { logger } from "@vestfoldfylke/loglady";
+import { type LogConfig, logger } from "@vestfoldfylke/loglady";
    
 const asyncLocalStorage = new AsyncLocalStorage<LogConfig>();
 
@@ -163,9 +164,8 @@ export function updateContext(logConfig: LogConfig): void {
 Then, create a "middleware" file called `errorHandling` which your API request handler calls. Here you can use the `runInContext` function to set the contextId for each request:
 ```typescript
 import type { HttpRequest, HttpResponseInit, InvocationContext } from "@azure/functions";
-import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
 
-import { logger } from "@vestfoldfylke/loglady";
+import { type LogConfig, logger } from "@vestfoldfylke/loglady";
 
 import { runInContext } from "./loggerMiddleware.js";
 

@@ -1,9 +1,9 @@
 import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
 
-import type { BetterStackPayload } from "../../types/destinations/betterstack.types";
-import type { LogDestination } from "../../types/LogDestination.types";
-import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
-import type { MinimalPackage } from "../../types/minimal-package.types";
+import type { BetterStackPayload } from "../../types/destinations/betterstack.types.js";
+import type { LogDestination } from "../../types/LogDestination.types.js";
+import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types.js";
+import type { MinimalPackage } from "../../types/minimal-package.types.js";
 
 import { colors } from "../Console/ansi-console.js";
 

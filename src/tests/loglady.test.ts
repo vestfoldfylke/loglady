@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 
-import { logger } from "../";
+import { logger } from "../index.js";
 
 const logFunctions = {
   debug: logger.debug,
@@ -115,11 +115,38 @@ describe("loglady 🪵  should throw errors during logging", () => {
   });
 
   it('when "error" is called with exception and messageTemplate with 1 placeholder but 0 parameters', () => {
+    // @ts-expect-error intentionally passing 0 params for a template with 1 placeholder to test runtime throw
     assert.throws(() => logger.errorException(new Error("Test"), "This is an error message: {Message}"));
   });
 
   it('when "error" is called with exception and messageTemplate with 1 placeholder but 2 parameters', () => {
+    // @ts-expect-error intentionally passing 2 params for a template with 1 placeholder to test runtime throw
     assert.throws(() => logger.errorException(new Error("Test"), "This is an error message: {Message}", "loglady 🪵 test", "makes no sense"));
+  });
+});
+
+describe("loglady 🪵  {@placeholder} should accept objects and arrays", () => {
+  it('when "info" is called with {@placeholder} and an object parameter', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.info("User {@User} logged in", { name: "alice", role: "admin" }));
+      assert.ok(output.includes("alice"));
+      assert.ok(output.includes("admin"));
+    });
+  });
+
+  it('when "info" is called with {@placeholder} and an array parameter', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.info("Items: {@Items}", ["a", "b", "c"]));
+      assert.ok(output.includes("a"));
+    });
+  });
+
+  it('when "info" is called with mixed placeholders — {@Obj} for object, {Name} for primitive', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.info("User {Name} has data {@Data}", "alice", { role: "admin" }));
+      assert.ok(output.includes("alice"));
+      assert.ok(output.includes("admin"));
+    });
   });
 });
 

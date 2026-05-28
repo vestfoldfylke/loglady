@@ -1,8 +1,10 @@
 import { Logger } from "./lib/logger.js";
 import { getInternalContext, setInternalContextProvider } from "./lib/logger-context.js";
 
-import type { MessageParameter, TrackedPromise } from "./types/log.types";
-import type { LogConfig } from "./types/log-config.types";
+import type { PlaceholderParams, TrackedPromise } from "./types/log.types.js";
+import type { LogConfig } from "./types/log-config.types.js";
+
+export type { LogConfig } from "./types/log-config.types.js";
 
 const _queue: TrackedPromise[] = [];
 
@@ -64,7 +66,7 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function debug(messageTemplate: string, ...params: MessageParameter[]): void {
+  export function debug<T extends string>(messageTemplate: T, ...params: PlaceholderParams<T>): void {
     const logConfig: LogConfig = getInternalContext() ?? _logConfig;
     _logger.log(logConfig, messageTemplate, "DEBUG", undefined, ...params);
   }
@@ -89,7 +91,7 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function info(messageTemplate: string, ...params: MessageParameter[]): void {
+  export function info<T extends string>(messageTemplate: T, ...params: PlaceholderParams<T>): void {
     const logConfig: LogConfig = getInternalContext() ?? _logConfig;
     _logger.log(logConfig, messageTemplate, "INFO", undefined, ...params);
   }
@@ -114,7 +116,7 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function warn(messageTemplate: string, ...params: MessageParameter[]): void {
+  export function warn<T extends string>(messageTemplate: T, ...params: PlaceholderParams<T>): void {
     const logConfig: LogConfig = getInternalContext() ?? _logConfig;
     _logger.log(logConfig, messageTemplate, "WARN", undefined, ...params);
   }
@@ -139,7 +141,7 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function error(messageTemplate: string, ...params: MessageParameter[]): void {
+  export function error<T extends string>(messageTemplate: T, ...params: PlaceholderParams<T>): void {
     const logConfig: LogConfig = getInternalContext() ?? _logConfig;
     _logger.log(logConfig, messageTemplate, "ERROR", undefined, ...params);
   }
@@ -169,7 +171,7 @@ export namespace logger {
    * @param messageTemplate - Message template with optional placeholders
    * @param params - Parameters to replace placeholders in message template
    */
-  export function errorException(exception: unknown, messageTemplate: string, ...params: MessageParameter[]): void {
+  export function errorException<T extends string>(exception: unknown, messageTemplate: T, ...params: PlaceholderParams<T>): void {
     const logConfig: LogConfig = getInternalContext() ?? _logConfig;
     _logger.log(logConfig, messageTemplate, "ERROR", exception, ...params);
   }
@@ -184,9 +186,7 @@ export namespace logger {
    * ```TypeScript
    * import { AsyncLocalStorage } from "node:async_hooks";
    *
-   * import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
-   *
-   * import { logger } from "@vestfoldfylke/loglady";
+   * import { type LogConfig, logger } from "@vestfoldfylke/loglady";
    *
    * const asyncLocalStorage = new AsyncLocalStorage<LogConfig>();
    *

@@ -1,4 +1,4 @@
-import type { MinimalPackage } from "../../types/minimal-package.types";
+import type { MinimalPackage } from "../../types/minimal-package.types.js";
 
 export const minimalPackage: MinimalPackage = {
   name: "test",

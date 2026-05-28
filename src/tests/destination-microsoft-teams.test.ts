@@ -3,10 +3,10 @@ import { afterEach, describe, it } from "node:test";
 
 import MicrosoftTeams from "../destinations/Microsoft Teams/index.js";
 
-import type { MicrosoftTeamsAction, MicrosoftTeamsBodyItem, MicrosoftTeamsPayload } from "../types/destinations/microsoft-teams.types";
-import type { MessageObject } from "../types/log.types";
+import type { MicrosoftTeamsAction, MicrosoftTeamsBodyItem, MicrosoftTeamsPayload } from "../types/destinations/microsoft-teams.types.js";
+import type { MessageObject } from "../types/log.types.js";
 
-import { minimalPackage } from "./lib/minimal-package";
+import { minimalPackage } from "./data/minimal-package.js";
 
 const originalEnv = { ...process.env };
 

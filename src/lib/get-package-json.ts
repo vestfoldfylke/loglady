@@ -1,7 +1,7 @@
-import { createRequire } from "node:module";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-import type { MinimalPackage } from "../types/minimal-package.types";
+import type { MinimalPackage } from "../types/minimal-package.types.js";
 
 /**
  * @internal
@@ -11,8 +11,6 @@ import type { MinimalPackage } from "../types/minimal-package.types";
  * @returns {MinimalPackage} The contents of the package.json file.
  */
 export function getPackageJson(): MinimalPackage {
-  const require = createRequire(import.meta.url);
   const packageJsonPath = join(process.cwd(), "package.json");
-
-  return require(packageJsonPath);
+  return JSON.parse(readFileSync(packageJsonPath, "utf-8")) as MinimalPackage;
 }
