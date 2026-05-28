@@ -5,6 +5,7 @@
     "module": "CommonJS",
     "target": "ES2020",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "emitDeclarationOnly": false,
     "declaration": false,
     "declarationMap": false,

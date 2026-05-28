@@ -47,9 +47,9 @@
   "license": "MIT",
   "description": "My log has something to tell you",
   "devDependencies": {
-    "@biomejs/biome": "2.4.6",
-    "@types/node": "^25.5.0",
-    "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "@biomejs/biome": "2.4.15",
+    "@types/node": "^25.9.1",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
   }
 }
