@@ -4,6 +4,8 @@ import { getInternalContext, setInternalContextProvider } from "./lib/logger-con
 import type { PlaceholderParams, TrackedPromise } from "./types/log.types.js";
 import type { LogConfig } from "./types/log-config.types.js";
 
+export type { LogConfig } from "./types/log-config.types.js";
+
 const _queue: TrackedPromise[] = [];
 
 const _logger = new Logger(_queue);
@@ -184,9 +186,7 @@ export namespace logger {
    * ```TypeScript
    * import { AsyncLocalStorage } from "node:async_hooks";
    *
-   * import type { LogConfig } from "@vestfoldfylke/loglady/dist/types/log-config.types";
-   *
-   * import { logger } from "@vestfoldfylke/loglady";
+   * import { type LogConfig, logger } from "@vestfoldfylke/loglady";
    *
    * const asyncLocalStorage = new AsyncLocalStorage<LogConfig>();
    *
