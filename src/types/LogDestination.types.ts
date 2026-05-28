@@ -1,4 +1,4 @@
-import type { LogLevel, MessageObject, TrackedPromise } from "./log.types";
+import type { LogLevel, MessageObject, TrackedPromise } from "./log.types.js";
 
 /**
  * Interface for a log destination<br /><br />

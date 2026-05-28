@@ -1,7 +1,7 @@
 import assert from "node:assert";
 import { describe, it } from "node:test";
 
-import { logger } from "../";
+import { logger } from "../index.js";
 
 const logFunctions = {
   debug: logger.debug,

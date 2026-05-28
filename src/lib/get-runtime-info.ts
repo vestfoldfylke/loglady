@@ -1,5 +1,5 @@
-import type { RuntimeInfo } from "../types/log.types";
-import type { MinimalPackage } from "../types/minimal-package.types";
+import type { RuntimeInfo } from "../types/log.types.js";
+import type { MinimalPackage } from "../types/minimal-package.types.js";
 
 /**
  * @internal

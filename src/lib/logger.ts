@@ -2,7 +2,7 @@ import BetterStackDestination from "../destinations/BetterStack/index.js";
 import ConsoleDestination from "../destinations/Console/index.js";
 import MicrosoftTeamsDestination from "../destinations/Microsoft Teams/index.js";
 
-import type { LogDestination } from "../types/LogDestination.types";
+import type { LogDestination } from "../types/LogDestination.types.js";
 import type {
   CallingInfo,
   LogLevel,
@@ -11,10 +11,10 @@ import type {
   MessageParameter,
   RuntimeInfo,
   TrackedPromise
-} from "../types/log.types";
+} from "../types/log.types.js";
 
-import type { LogConfig } from "../types/log-config.types";
-import type { MinimalPackage } from "../types/minimal-package.types";
+import type { LogConfig } from "../types/log-config.types.js";
+import type { MinimalPackage } from "../types/minimal-package.types.js";
 
 import { getPackageJson } from "./get-package-json.js";
 import { getRuntimeInfo } from "./get-runtime-info.js";

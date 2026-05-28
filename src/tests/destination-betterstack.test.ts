@@ -3,10 +3,10 @@ import { afterEach, describe, it } from "node:test";
 
 import BetterStack from "../destinations/BetterStack/index.js";
 
-import type { BetterStackPayload } from "../types/destinations/betterstack.types";
-import type { MessageObject } from "../types/log.types";
+import type { BetterStackPayload } from "../types/destinations/betterstack.types.js";
+import type { MessageObject } from "../types/log.types.js";
 
-import { minimalPackage } from "./lib/minimal-package";
+import { minimalPackage } from "./data/minimal-package.js";
 
 const originalEnv = { ...process.env };
 

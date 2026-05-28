@@ -1,8 +1,8 @@
 import { Logger } from "./lib/logger.js";
 import { getInternalContext, setInternalContextProvider } from "./lib/logger-context.js";
 
-import type { PlaceholderParams, TrackedPromise } from "./types/log.types";
-import type { LogConfig } from "./types/log-config.types";
+import type { PlaceholderParams, TrackedPromise } from "./types/log.types.js";
+import type { LogConfig } from "./types/log-config.types.js";
 
 const _queue: TrackedPromise[] = [];
 

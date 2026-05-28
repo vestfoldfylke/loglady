@@ -1,9 +1,9 @@
 import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
 
-import type { ConsolePayload } from "../../types/destinations/console.types";
-import type { LogDestination } from "../../types/LogDestination.types";
-import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types";
-import type { MinimalPackage } from "../../types/minimal-package.types";
+import type { ConsolePayload } from "../../types/destinations/console.types.js";
+import type { LogDestination } from "../../types/LogDestination.types.js";
+import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types.js";
+import type { MinimalPackage } from "../../types/minimal-package.types.js";
 
 import { colorDebug, colorError, colorInfo, colorWarn } from "./ansi-console.js";
 

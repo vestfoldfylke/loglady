@@ -3,10 +3,10 @@ import { describe, it } from "node:test";
 
 import Console from "../destinations/Console/index.js";
 
-import type { ConsolePayload } from "../types/destinations/console.types";
-import type { MessageObject } from "../types/log.types";
+import type { ConsolePayload } from "../types/destinations/console.types.js";
+import type { MessageObject } from "../types/log.types.js";
 
-import { minimalPackage } from "./lib/minimal-package";
+import { minimalPackage } from "./data/minimal-package.js";
 
 const logLevels: string[] = ["debug", "info", "warn", "error", "DEBUG", "INFO", "WARN", "ERROR"];
 

@@ -3,7 +3,7 @@ import { describe, it } from "node:test";
 
 import { canLogAtLevel, validateLogLevel } from "../lib/log-level.js";
 
-import type { LogLevel } from "../types/log.types";
+import type { LogLevel } from "../types/log.types.js";
 
 const logLevels: string[] = ["debug", "info", "warn", "error", "DEBUG", "INFO", "WARN", "ERROR"];
 

@@ -1,4 +1,4 @@
-import type { LogConfig } from "../types/log-config.types";
+import type { LogConfig } from "../types/log-config.types.js";
 
 let getContext: () => LogConfig | undefined = () => undefined;
 
