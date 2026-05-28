@@ -23,7 +23,6 @@ export default class ConsoleDestination implements LogDestination {
   readonly name: string = "Console";
 
   private readonly _minLogLevel: LogLevel;
-  // @ts-expect-error - This comment can be removed when _pkg is used
   private readonly _pkg: MinimalPackage;
 
   constructor(pkg: MinimalPackage) {
@@ -42,7 +41,7 @@ export default class ConsoleDestination implements LogDestination {
   createPayload<T>(messageObject: MessageObject, level: LogLevel): T {
     return [
       new Date().toISOString(),
-      `[${level}]`,
+      `[${this._pkg.name || "unknown-package-name"}@${this._pkg.version || "unknown-version"}] [${level}]`,
       messageObject.properties["ContextId"] ? `[${messageObject.properties["ContextId"]}]` : undefined,
       messageObject.message
     ].filter((part) => part !== undefined) as T;
