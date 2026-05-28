@@ -1,15 +1,14 @@
 {
   "name": "@vestfoldfylke/loglady",
   "version": "1.5.3",
-  "main": "./dist/cjs/index.cjs",
+  "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "browser": "./dist/browser/index.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
-      "require": "./dist/cjs/index.cjs",
-      "import": "./dist/esm/index.js",
-      "types": "./dist/index.d.ts"
+      "types": "./dist/esm/index.d.ts",
+      "require": "./dist/cjs/index.js",
+      "import": "./dist/esm/index.js"
     }
   },
   "files": [
@@ -21,7 +20,7 @@
     "node": ">=18"
   },
   "scripts": {
-    "build": "tsc && rollup -c",
+    "build": "tsc && tsc -p tsconfig.esm.json && tsc -p tsconfig.cjs.json && node -e \"import('node:fs').then(({writeFileSync})=>writeFileSync('dist/cjs/package.json',JSON.stringify({type:'commonjs'})))\"",
     "pack": "npm run test && rm -rf dist && rm -f vestfoldfylke-loglady-*.tgz && npm run build && npm pack",
     "test": "biome check && node --import tsx --test src/tests/**/*.test.ts",
     "lint:fix": "biome check --write",
@@ -49,13 +48,7 @@
   "description": "My log has something to tell you",
   "devDependencies": {
     "@biomejs/biome": "2.4.6",
-    "@rollup/plugin-commonjs": "^29.0.2",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
     "@types/node": "^25.5.0",
-    "rollup": "^4.60.0",
-    "rollup-plugin-dts": "^6.4.1",
-    "rollup-plugin-esbuild": "^6.2.1",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }

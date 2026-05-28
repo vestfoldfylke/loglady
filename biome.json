@@ -18,9 +18,17 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "correctness": {
+        "useImportExtensions": {
+          "options": {
+            "forceJsExtensions": true
+          },
+          "level": "error"
+        }
+      }
     },
-    "includes": ["**", "!!rollup.config.mjs", "!dist", "!node_modules"]
+    "includes": ["**", "!dist", "!node_modules"]
   },
   "javascript": {
     "formatter": {

@@ -4,6 +4,7 @@
     "outDir": "./dist/esm",
     "module": "ESNext",
     "target": "ESNext",
+    "emitDeclarationOnly": false,
     "importHelpers": false
   }
 }
