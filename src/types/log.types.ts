@@ -18,6 +18,19 @@ export type LogLevel = "debug" | "info" | "warn" | "error" | "DEBUG" | "INFO" | 
 
 export type MessageParameter = string | number | bigint | boolean | object | [] | undefined | null;
 
+/**
+ * Counts `{placeholder}` occurrences in a string literal type and returns a tuple
+ * of `MessageParameter` with exactly that length.
+ *
+ * Falls back to `MessageParameter[]` (variadic, no enforcement) when `T` is the
+ * widened `string` type (i.e. a runtime variable whose value isn't known at compile time).
+ */
+export type PlaceholderParams<T extends string, Acc extends MessageParameter[] = []> = string extends T
+  ? MessageParameter[]
+  : T extends `${string}{${infer _}}${infer Rest}`
+    ? PlaceholderParams<Rest, [...Acc, MessageParameter]>
+    : Acc;
+
 export type MessageObjectProperties = {
   [key: string]: MessageParameter;
 };

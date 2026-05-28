@@ -7,7 +7,7 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "ESNext",
+    "module": "preserve",
     "target": "ES2020",
     "lib": ["ESNext"],
 
@@ -30,7 +30,7 @@
     "noPropertyAccessFromIndexSignature": true,
 
     // Recommended Options
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
@@ -39,7 +39,10 @@
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "emitDeclarationOnly": true,
-    "importHelpers": false
+    "importHelpers": false,
+
+    // Types
+    "types": ["node"]
   },
   "include": ["src/**/*"]
 }

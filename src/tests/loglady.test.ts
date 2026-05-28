@@ -115,10 +115,12 @@ describe("loglady 🪵  should throw errors during logging", () => {
   });
 
   it('when "error" is called with exception and messageTemplate with 1 placeholder but 0 parameters', () => {
+    // @ts-expect-error intentionally passing 0 params for a template with 1 placeholder to test runtime throw
     assert.throws(() => logger.errorException(new Error("Test"), "This is an error message: {Message}"));
   });
 
   it('when "error" is called with exception and messageTemplate with 1 placeholder but 2 parameters', () => {
+    // @ts-expect-error intentionally passing 2 params for a template with 1 placeholder to test runtime throw
     assert.throws(() => logger.errorException(new Error("Test"), "This is an error message: {Message}", "loglady 🪵 test", "makes no sense"));
   });
 });
