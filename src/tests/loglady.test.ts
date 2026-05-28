@@ -125,6 +125,31 @@ describe("loglady 🪵  should throw errors during logging", () => {
   });
 });
 
+describe("loglady 🪵  {@placeholder} should accept objects and arrays", () => {
+  it('when "info" is called with {@placeholder} and an object parameter', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.info("User {@User} logged in", { name: "alice", role: "admin" }));
+      assert.ok(output.includes("alice"));
+      assert.ok(output.includes("admin"));
+    });
+  });
+
+  it('when "info" is called with {@placeholder} and an array parameter', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.info("Items: {@Items}", ["a", "b", "c"]));
+      assert.ok(output.includes("a"));
+    });
+  });
+
+  it('when "info" is called with mixed placeholders — {@Obj} for object, {Name} for primitive', () => {
+    assert.doesNotThrow(() => {
+      const output = mockStdoutAndCallLogger(() => logger.info("User {Name} has data {@Data}", "alice", { role: "admin" }));
+      assert.ok(output.includes("alice"));
+      assert.ok(output.includes("admin"));
+    });
+  });
+});
+
 describe("loglady 🪵  logConfig should be callable multiple times", () => {
   it("should be empty initially and only contain updated property after calling logConfig", () => {
     const contextIdStr = "CONTEXT_ID";

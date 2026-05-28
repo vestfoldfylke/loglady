@@ -16,19 +16,22 @@ export type ConsoleColors = {
 
 export type LogLevel = "debug" | "info" | "warn" | "error" | "DEBUG" | "INFO" | "WARN" | "ERROR";
 
-export type MessageParameter = string | number | bigint | boolean | object | [] | undefined | null;
+export type PrimitiveParameter = string | number | bigint | boolean | undefined | null;
+export type MessageParameter = PrimitiveParameter | object | [];
 
 /**
  * Counts `{placeholder}` occurrences in a string literal type and returns a tuple
- * of `MessageParameter` with exactly that length.
+ * with exactly that length. Placeholders prefixed with `@` (e.g. `{@User}`) accept
+ * any `MessageParameter` (including objects/arrays, which get JSON-stringified at
+ * runtime). Plain placeholders (e.g. `{Name}`) only accept `PrimitiveParameter`.
  *
  * Falls back to `MessageParameter[]` (variadic, no enforcement) when `T` is the
  * widened `string` type (i.e. a runtime variable whose value isn't known at compile time).
  */
 export type PlaceholderParams<T extends string, Acc extends MessageParameter[] = []> = string extends T
   ? MessageParameter[]
-  : T extends `${string}{${infer _}}${infer Rest}`
-    ? PlaceholderParams<Rest, [...Acc, MessageParameter]>
+  : T extends `${string}{${infer Name}}${infer Rest}`
+    ? PlaceholderParams<Rest, [...Acc, Name extends `@${string}` ? MessageParameter : PrimitiveParameter]>
     : Acc;
 
 export type MessageObjectProperties = {
