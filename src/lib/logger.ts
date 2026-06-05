@@ -203,6 +203,10 @@ export class Logger {
    */
   public flush = (): void => {
     for (const destination of this._destinations) {
+      if (!destination.active) {
+        return;
+      }
+
       destination.flush?.();
     }
   };
