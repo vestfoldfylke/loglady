@@ -40,15 +40,15 @@ Optional environment variables:
 
 The Console log destination is enabled by default. You can disable it by setting the following environment variable:
 - `CONSOLE_ENABLED`: Set to `false` to disable console logging
-- `CONSOLE_MIN_LOG_LEVEL`: The minimum log level to log to console (see log levels above)
+- `CONSOLE_MIN_LOG_LEVEL`: The minimum log level to log to console (see log levels above) (default is DEBUG)
 
 ### Microsoft Teams destination
 
 To use the Microsoft Teams log destination, you need to set the following environment variables:
 - `TEAMS_WEBHOOK_URL`: Your Microsoft Teams webhook URL
-- `TEAMS_MIN_LOG_LEVEL`: The minimum log level to send to Microsoft Teams (see log levels above)
 
 Optional environment variables:
+- `TEAMS_MIN_LOG_LEVEL`: The minimum log level to send to Microsoft Teams (see log levels above) (default is ERROR)
 - `TEAMS_LINKS`: Comma separated, semicolon separated list of name and url to show as ActionButtons (open url) on the teams card.
 See example further down under [Usage](#usage) 
 
