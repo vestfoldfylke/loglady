@@ -47,7 +47,14 @@ export default class BetterStackDestination implements LogDestination {
     }
 
     this._batchSize = Number(process.env["BETTERSTACK_BATCH_SIZE"] ?? 100);
+    if (Number.isNaN(this._batchSize) || this._batchSize <= 0) {
+      throw new Error(`Invalid BETTERSTACK_BATCH_SIZE value: ${process.env["BETTERSTACK_BATCH_SIZE"]}`);
+    }
+
     this._batchIntervalMs = Number(process.env["BETTERSTACK_BATCH_INTERVAL_MS"] ?? 500);
+    if (Number.isNaN(this._batchIntervalMs) || this._batchIntervalMs <= 0) {
+      throw new Error(`Invalid BETTERSTACK_BATCH_INTERVAL_MS value: ${process.env["BETTERSTACK_BATCH_INTERVAL_MS"]}`);
+    }
 
     this._pkg = pkg;
 
