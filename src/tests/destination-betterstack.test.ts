@@ -144,11 +144,22 @@ describe("BetterStack log destination", () => {
     await setTimeout(1000);
 
     // with 500 messages and only relying on batchTimer kicking in - should be split into 5 calls
+    let fetchCallCount = 0;
+    const fetchBatchSizes: number[] = [];
+    globalThis.fetch = async (_input, init) => {
+      fetchCallCount++;
+      if (init?.body) {
+        fetchBatchSizes.push((JSON.parse(init.body as string) as unknown[]).length);
+      }
+      throw new Error("Simulated network error");
+    };
+
     try {
       for (let i = 0; i < 500; i++) {
         betterStackInstance.log(messageObjectOne, "WARN");
-        assert.ok(true, "Error during POST request without flush should be caught and logged");
       }
+      assert.strictEqual(fetchCallCount, 5, "500 messages with batch size 100 should result in 5 fetch calls");
+      assert.deepStrictEqual(fetchBatchSizes, [100, 100, 100, 100, 100], "Each batch should contain 100 messages");
     } catch (error) {
       assert.ok(false, `Error during POST request without flush should be caught and logged, but error occurred: ${(error as Error).message}`);
     } finally {
