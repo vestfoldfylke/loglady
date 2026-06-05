@@ -184,5 +184,5 @@ export interface LogDestination {
    * buffered entries are dispatched and their promises are in-flight before the
    * caller starts waiting.
    */
-  flush?(): void | Promise<void>;
+  flush?(): void;
 }
