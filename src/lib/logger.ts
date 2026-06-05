@@ -193,4 +193,17 @@ export class Logger {
       this.cleanupQueue();
     }
   };
+
+  /**
+   * @internal
+   *
+   * Flushes any buffered entries in destinations that support batching.
+   * Must be called before awaiting the tracked-promise queue so that buffered
+   * entries are in-flight and their promises are present in the queue.
+   */
+  public flush = (): void => {
+    for (const destination of this._destinations) {
+      destination.flush?.();
+    }
+  };
 }

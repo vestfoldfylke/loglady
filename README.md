@@ -24,10 +24,17 @@ The following log levels are supported and can be set as the minimum log level f
 
 ### BetterStack destination
 
+The BetterStack log destination batch log messages up to the size specified in the `BETTERSTACK_BATCH_SIZE` environment variable or until the time specified in the `BETTERSTACK_BATCH_INTERVAL_MS` environment variable has passed, whichever comes first.
+This to minimize the number of requests sent to BetterStack.
+
 To use the BetterStack log destination, you need to set the following environment variables:
 - `BETTERSTACK_URL`: Your BetterStack endpoint URL
 - `BETTERSTACK_TOKEN`: The BetterStack token for authentication
-- `BETTERSTACK_MIN_LOG_LEVEL`: The minimum log level to send to BetterStack (see log levels above)
+
+Optional environment variables:
+- `BETTERSTACK_MIN_LOG_LEVEL`: The minimum log level to send to BetterStack (see log levels above) (default is INFO)
+- `BETTERSTACK_BATCH_SIZE`: The number of log messages to send in each batch (default is 100)
+- `BETTERSTACK_BATCH_INTERVAL_MS`: The interval in milliseconds to wait before sending a batch of log messages (default is 500)
 
 ### Console destination
 

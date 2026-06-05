@@ -1,4 +1,4 @@
-import type { ConsoleColors } from "../../types/log.types.js";
+import type { ConsoleColors } from "../types/log.types.js";
 
 export const colors: ConsoleColors = {
   reset: "\u001b[0m",
