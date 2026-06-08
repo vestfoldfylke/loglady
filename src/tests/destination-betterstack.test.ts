@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import { afterEach, describe, it } from "node:test";
+import { setTimeout } from "node:timers/promises";
 
 import BetterStack from "../destinations/BetterStack/index.js";
 
@@ -105,7 +106,7 @@ describe("BetterStack log destination", () => {
     }
   });
 
-  it("should catch and log errors during message POST request", () => {
+  it("should catch and log errors during message POST request", async () => {
     process.env["BETTERSTACK_URL"] = "https://example.betterstack.com";
     process.env["BETTERSTACK_TOKEN"] = "example-token";
 
@@ -117,17 +118,50 @@ describe("BetterStack log destination", () => {
       throw new Error("Simulated network error");
     };
 
-    const messageObject: MessageObject = {
-      messageTemplate: "Test message for error handling",
-      message: "Test message for error handling",
+    const messageObjectOne: MessageObject = {
+      messageTemplate: "Test message one for error handling",
+      message: "Test message one for error handling",
       properties: {}
     };
 
+    const messageObjectTwo: MessageObject = {
+      messageTemplate: "Test message two for error handling",
+      message: "Test message two for error handling",
+      properties: {}
+    };
+
+    // with 2 messages and flush between
     try {
-      betterStackInstance.log(messageObject, "WARN");
-      assert.ok(true, "Error during POST request should be caught and logged");
+      betterStackInstance.log(messageObjectOne, "WARN");
+      betterStackInstance.flush();
+      betterStackInstance.log(messageObjectTwo, "INFO");
+      betterStackInstance.flush();
+      assert.ok(true, "Error during POST request with flush should be caught and logged");
     } catch (error) {
-      assert.ok(false, `Error during POST request should be caught and logged, but error occurred: ${(error as Error).message}`);
+      assert.ok(false, `Error during POST request with flush should be caught and logged, but error occurred: ${(error as Error).message}`);
+    }
+
+    await setTimeout(1000);
+
+    // with 500 messages and only relying on batchTimer kicking in - should be split into 5 calls
+    let fetchCallCount = 0;
+    const fetchBatchSizes: number[] = [];
+    globalThis.fetch = async (_input, init) => {
+      fetchCallCount++;
+      if (init?.body) {
+        fetchBatchSizes.push((JSON.parse(init.body as string) as unknown[]).length);
+      }
+      throw new Error("Simulated network error");
+    };
+
+    try {
+      for (let i = 0; i < 500; i++) {
+        betterStackInstance.log(messageObjectOne, "WARN");
+      }
+      assert.strictEqual(fetchCallCount, 5, "500 messages with batch size 100 should result in 5 fetch calls");
+      assert.deepStrictEqual(fetchBatchSizes, [100, 100, 100, 100, 100], "Each batch should contain 100 messages");
+    } catch (error) {
+      assert.ok(false, `Error during POST request without flush should be caught and logged, but error occurred: ${(error as Error).message}`);
     } finally {
       // Restore the original fetch function
       globalThis.fetch = originalFetch;

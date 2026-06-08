@@ -175,4 +175,14 @@ export interface LogDestination {
    * @returns A **TrackedPromise** where `isSettled` will be `true` when the logging is complete (either successfully or with an error)
    */
   log(messageObject: MessageObject, level: LogLevel): TrackedPromise;
+
+  /**
+   * Flush any buffered log entries immediately.<br /><br />
+   *
+   * Implement this if the destination buffers entries internally (e.g. for batching).
+   * Called by `logger.flush()` before awaiting the tracked-promise queue, so that
+   * buffered entries are dispatched and their promises are in-flight before the
+   * caller starts waiting.
+   */
+  flush?(): void;
 }

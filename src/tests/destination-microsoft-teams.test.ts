@@ -49,7 +49,7 @@ describe("Microsoft Teams log destination", () => {
     assert.strictEqual(
       (payload.attachments[0]?.content.body[2] as MicrosoftTeamsBodyItem).facts?.length,
       1,
-      "Payload body factset should only have 1 element"
+      "Payload body fact set should only have 1 element"
     );
   });
 

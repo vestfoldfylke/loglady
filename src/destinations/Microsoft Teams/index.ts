@@ -1,5 +1,5 @@
+import { colors } from "../../lib/ansi-console.js";
 import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
-
 import type {
   MicrosoftTeamsColor,
   MicrosoftTeamsFact,
@@ -9,8 +9,6 @@ import type {
 import type { LogDestination } from "../../types/LogDestination.types.js";
 import type { LogLevel, MessageObject, MessageObjectProperties, MessageParameter, TrackedPromise } from "../../types/log.types.js";
 import type { MinimalPackage } from "../../types/minimal-package.types.js";
-
-import { colors } from "../Console/ansi-console.js";
 
 // noinspection JSUnusedGlobalSymbols
 /**

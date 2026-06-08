@@ -1,3 +1,9 @@
+export type BufferedDestinationEntry<T> = {
+  payload: T;
+  trackedPromise: TrackedPromise;
+  settle: () => void;
+};
+
 export type CallingInfo = {
   functionName: string;
   fileName: string;

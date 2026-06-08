@@ -1,11 +1,9 @@
+import { colors } from "../../lib/ansi-console.js";
 import { canLogAtLevel, validateLogLevel } from "../../lib/log-level.js";
-
 import type { BetterStackPayload } from "../../types/destinations/betterstack.types.js";
 import type { LogDestination } from "../../types/LogDestination.types.js";
-import type { LogLevel, MessageObject, TrackedPromise } from "../../types/log.types.js";
+import type { BufferedDestinationEntry, LogLevel, MessageObject, TrackedPromise } from "../../types/log.types.js";
 import type { MinimalPackage } from "../../types/minimal-package.types.js";
-
-import { colors } from "../Console/ansi-console.js";
 
 // noinspection JSUnusedGlobalSymbols
 /**
@@ -16,7 +14,11 @@ import { colors } from "../Console/ansi-console.js";
  * **active**: `true` only when **BETTERSTACK_URL** and **BETTERSTACK_TOKEN** are specified as environment variables<br />
  * **name**: 'BetterStack'<br /><br >
  *
- * Minimum log level defaults to `INFO` but can be customized by specifying the **BETTERSTACK_MIN_LOG_LEVEL** environment variable
+ * Minimum log level defaults to `INFO` but can be customized by specifying the **BETTERSTACK_MIN_LOG_LEVEL** environment variable<br /><br />
+ *
+ * Log entries are buffered and sent in batches to reduce the number of HTTP requests.
+ * A batch is dispatched when it reaches **BETTERSTACK_BATCH_SIZE** entries (default: 100)
+ * or after **BETTERSTACK_BATCH_INTERVAL_MS** milliseconds (default: 500), whichever comes first.
  */
 export default class BetterStackDestination implements LogDestination {
   readonly active: boolean;
@@ -29,6 +31,12 @@ export default class BetterStackDestination implements LogDestination {
   // @ts-expect-error - This comment can be removed when _pkg is used
   private readonly _pkg: MinimalPackage;
 
+  private readonly _batchSize: number;
+  private readonly _batchIntervalMs: number;
+
+  private _buffer: BufferedDestinationEntry<BetterStackPayload>[] = [];
+  private _batchTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor(pkg: MinimalPackage) {
     this._endpoint = process.env["BETTERSTACK_URL"];
     this._token = process.env["BETTERSTACK_TOKEN"];
@@ -36,6 +44,16 @@ export default class BetterStackDestination implements LogDestination {
     this._minLogLevel = (process.env["BETTERSTACK_MIN_LOG_LEVEL"] as LogLevel) || "INFO";
     if (!validateLogLevel(this._minLogLevel)) {
       throw new Error(`Invalid BETTERSTACK_MIN_LOG_LEVEL value: ${process.env["BETTERSTACK_MIN_LOG_LEVEL"]}`);
+    }
+
+    this._batchSize = Number(process.env["BETTERSTACK_BATCH_SIZE"] ?? 100);
+    if (Number.isNaN(this._batchSize) || this._batchSize <= 0) {
+      throw new Error(`Invalid BETTERSTACK_BATCH_SIZE value: ${process.env["BETTERSTACK_BATCH_SIZE"]}`);
+    }
+
+    this._batchIntervalMs = Number(process.env["BETTERSTACK_BATCH_INTERVAL_MS"] ?? 500);
+    if (Number.isNaN(this._batchIntervalMs) || this._batchIntervalMs <= 0) {
+      throw new Error(`Invalid BETTERSTACK_BATCH_INTERVAL_MS value: ${process.env["BETTERSTACK_BATCH_INTERVAL_MS"]}`);
     }
 
     this._pkg = pkg;
@@ -60,16 +78,11 @@ export default class BetterStackDestination implements LogDestination {
       };
     }
 
-    const messagePayload: BetterStackPayload = this.createPayload<BetterStackPayload>(messageObject, level);
+    const payload: BetterStackPayload = this.createPayload<BetterStackPayload>(messageObject, level);
 
-    const promise: Promise<Response> = fetch(this._endpoint as string, {
-      method: "POST",
-      signal: AbortSignal.timeout(5000),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${this._token}`
-      },
-      body: JSON.stringify(messagePayload)
+    let settle!: () => void;
+    const promise = new Promise<void>((resolve) => {
+      settle = resolve;
     });
 
     const trackedPromise: TrackedPromise = {
@@ -78,19 +91,50 @@ export default class BetterStackDestination implements LogDestination {
       isSettled: false
     };
 
-    promise
-      .catch((error: unknown) =>
-        console.error(
-          `${colors.fgRed}Failed to log message to ${this.name}. Message:${colors.reset}`,
-          messagePayload,
-          `${colors.fgRed}--->${colors.reset}`,
-          error
-        )
-      )
-      .finally((): void => {
-        trackedPromise.isSettled = true;
-      });
+    this._buffer.push({ payload, trackedPromise, settle });
+
+    if (this._buffer.length >= this._batchSize) {
+      this._sendBatch();
+    } else if (this._batchTimer === null) {
+      this._batchTimer = setTimeout(() => this._sendBatch(), this._batchIntervalMs);
+    }
 
     return trackedPromise;
+  }
+
+  flush(): void {
+    this._sendBatch();
+  }
+
+  private _sendBatch(): void {
+    if (this._batchTimer !== null) {
+      clearTimeout(this._batchTimer);
+      this._batchTimer = null;
+    }
+
+    if (this._buffer.length === 0) {
+      return;
+    }
+
+    const batch: BufferedDestinationEntry<BetterStackPayload>[] = this._buffer.splice(0);
+
+    fetch(this._endpoint as string, {
+      method: "POST",
+      signal: AbortSignal.timeout(5000),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this._token}`
+      },
+      body: JSON.stringify(batch.map((entry) => entry.payload))
+    })
+      .catch((error: unknown) =>
+        console.error(`${colors.fgRed}Failed to log batch of ${batch.length} message(s) to ${this.name} --->${colors.reset}`, error)
+      )
+      .finally(() => {
+        for (const entry of batch) {
+          entry.trackedPromise.isSettled = true;
+          entry.settle();
+        }
+      });
   }
 }

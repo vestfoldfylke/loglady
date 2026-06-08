@@ -1,6 +1,6 @@
 {
   "name": "@vestfoldfylke/loglady",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "main": "./dist/cjs/index.cjs",
   "module": "./dist/esm/index.js",
   "types": "./dist/types/index.d.ts",
@@ -47,7 +47,7 @@
   "license": "MIT",
   "description": "My log has something to tell you",
   "devDependencies": {
-    "@biomejs/biome": "2.4.15",
+    "@biomejs/biome": "2.4.16",
     "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^25.9.1",
     "rollup": "^4.60.4",
